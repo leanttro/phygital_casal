@@ -338,7 +338,7 @@
 
         {% else %}
 
-            <div class="max-md mx-auto bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden mt-10">
+            <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden mt-10">
                 <div class="p-8 pb-6 text-center">
                     <div class="mx-auto bg-pink-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-pink-500">
                         <i data-lucide="lock" class="w-8 h-8"></i>
@@ -409,7 +409,7 @@
             });
         }
 
-        // 3. Drag & Drop da LINHA DO TEMPO (NOVO)
+        // 3. Drag & Drop da LINHA DO TEMPO
         const timelineList = document.getElementById('timeline-sort-list');
         if (timelineList) {
             new Sortable(timelineList, {

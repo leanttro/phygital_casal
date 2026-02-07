@@ -346,7 +346,10 @@ def login(slug):
                     page.font_style = request.form.get('font_style', 'sans')
                     
                     # === NOVO: Salva a Ordem das Seções ===
-                    page.layout_order = request.form.get('layout_order', page.layout_order)
+                    # Importante: O .get() retorna a nova ordem enviada pelo input hidden
+                    new_layout = request.form.get('layout_order')
+                    if new_layout:
+                        page.layout_order = new_layout
                     
                     # 3. Atualizar Spotify
                     new_spotify = request.form.get('spotify_url', '').strip()
@@ -436,7 +439,7 @@ def health_check():
     return jsonify(status)
 
 # ============================================================================
-# INICIALIZAÇÃO
+# INICIALIZAÇÃO & MIGRAÇÃO AUTOMÁTICA
 # ============================================================================
 
 if __name__ == '__main__':
@@ -445,7 +448,7 @@ if __name__ == '__main__':
         os.makedirs(app.config['SESSION_FILE_DIR'])
 
     with app.app_context():
-        # Cria tabelas se não existirem
+        # 1. Cria tabelas se não existirem
         try:
             db.create_all()
         except Exception as e:

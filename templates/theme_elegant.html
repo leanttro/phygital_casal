@@ -160,7 +160,7 @@
             <div class="max-w-6xl mx-auto relative px-4">
                 <div class="swiper mySwiper">
                     <div class="swiper-wrapper">
-                        {% for photo in page.photos[:4] %}
+                        {% for photo in page.photos %}
                         <div class="swiper-slide">
                             <img src="{{ photo.image_url }}" alt="Momento {{ loop.index }}">
                         </div>

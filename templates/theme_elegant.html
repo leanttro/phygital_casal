@@ -177,9 +177,10 @@
                     </div>
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-50">
                         <span class="text-xs font-bold uppercase tracking-widest opacity-50" style="color: {{ page.font_color }};">
-                            {{ event.date }}
+                            {% set parts = event.date.split('-') %}
+                            {{ parts[2] }}/{{ parts[1] }}/{{ parts[0] }}
                         </span>
-                        <div class="w-8 h-1 mt-1 mb-2" style="background-color: {{ page.background_color }};"></div>
+                        <div class="w-12 h-1.5 mt-1.5 mb-2 rounded-full" style="background-color: {{ page.background_color }};"></div>
                         <h3 class="text-xl font-bold mt-1" style="color: {{ page.background_color }};">{{ event.title }}</h3>
                     </div>
                 </div>

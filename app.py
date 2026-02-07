@@ -290,10 +290,7 @@ def love_page(slug):
         if isinstance(page.timeline_data, list):
             timeline_list = page.timeline_data
         else:
-            try:
-                timeline_list = json.loads(page.timeline_data) if page.timeline_data else []
-            except:
-                timeline_list = []
+            timeline_list = json.loads(page.timeline_data) if page.timeline_data else []
 
         return render_template(
             template_name,
@@ -341,10 +338,7 @@ def login(slug):
                 if isinstance(page.timeline_data, list):
                     current_timeline = page.timeline_data
                 else:
-                    try:
-                        current_timeline = json.loads(page.timeline_data) if page.timeline_data else []
-                    except:
-                        current_timeline = []
+                    current_timeline = json.loads(page.timeline_data) if page.timeline_data else []
 
                 # --- Ação A: EXCLUIR FOTO ---
                 delete_id = request.form.get('delete_photo_id')
@@ -369,7 +363,7 @@ def login(slug):
                     except ValueError:
                         error = "ID de foto inválido."
 
-                elif delete_event_idx is not None:
+                elif delete_event_idx:
                     try:
                         idx = int(delete_event_idx)
                         if 0 <= idx < len(current_timeline):
@@ -470,10 +464,7 @@ def login(slug):
     if isinstance(page.timeline_data, list):
         timeline_display = page.timeline_data
     else:
-        try:
-            timeline_display = json.loads(page.timeline_data) if page.timeline_data else []
-        except:
-            timeline_display = []
+        timeline_display = json.loads(page.timeline_data) if page.timeline_data else []
 
     return render_template(
         'login.html', 

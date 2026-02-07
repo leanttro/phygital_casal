@@ -240,7 +240,7 @@ def love_page(slug):
             return render_template('404.html', slug=slug), 404
         
         return render_template(
-            'index.html',
+            'love_page.html', # Você pode renomear index.html para love_page.html ou mudar aqui para index.html
             page=page,
             current_year=datetime.now().year
         )
@@ -251,9 +251,7 @@ def love_page(slug):
 @app.route('/<slug>/login', methods=['GET', 'POST'])
 def login(slug):
     """
-    Rota Unificada: Autenticação + Edição
-    Se não logado: Mostra form de senha.
-    Se logado: Mostra form de edição (antigo dashboard).
+    Rota Unificada: Autenticação + Edição + Exclusão + Ordenação
     """
     page = LovePage.query.filter_by(slug=slug).first_or_404()
     
@@ -272,59 +270,104 @@ def login(slug):
                 session.permanent = True
                 is_logged_in = True
                 logger.info(f"Login efetuado para: {slug}")
-                # Redireciona para GET para limpar o POST da senha e mostrar o editor
                 return redirect(url_for('login', slug=slug))
             else:
                 error = "Senha incorreta."
                 logger.warning(f"Falha login para: {slug}")
 
-        # --- CASO 2: Salvar Edições (Formulário de Edição) ---
-        # Só executa se já estiver logado
+        # --- CASO 2: Ações do Painel (Salvar, Excluir, Ordenar) ---
         elif is_logged_in:
             try:
-                # 1. Atualizar Textos (PostgreSQL)
-                page.title = request.form.get('titulo', page.title).strip()
-                page.message = request.form.get('mensagem', page.message).strip()
-                page.background_color = request.form.get('cor_fundo', page.background_color)
+                # --- Ação A: EXCLUIR FOTO ---
+                delete_id = request.form.get('delete_photo_id')
                 
-                # 2. Atualizar Spotify
-                new_spotify = request.form.get('spotify_url', '').strip()
-                if new_spotify:
-                    page.spotify_url = ensure_embed_url(new_spotify)
-                
-                # 3. Uploads (Flask -> Directus -> Postgres)
-                uploaded_files = request.files.getlist('fotos')
-                files_processed = 0
-                
-                for file in uploaded_files:
-                    if file and file.filename:
-                        # Envia para Directus
-                        directus_url = upload_file_to_directus(file)
+                # Se delete_id estiver presente, é uma ação de exclusão
+                if delete_id:
+                    try:
+                        photo_id = int(delete_id)
+                        # Busca a foto no banco (compatível com SQLAlchemy moderno e legado)
+                        photo_to_delete = PagePhoto.query.get(photo_id)
                         
-                        if directus_url:
-                            # Salva referencia no Postgres
-                            new_photo = PagePhoto(
-                                page_id=page.id,
-                                image_url=directus_url,
-                                display_order=0 
-                            )
-                            db.session.add(new_photo)
-                            files_processed += 1
+                        # Segurança: Verifica se a foto existe E se pertence a essa página
+                        if photo_to_delete and photo_to_delete.page_id == page.id:
+                            db.session.delete(photo_to_delete)
+                            db.session.commit()
+                            
+                            # CRÍTICO: Atualiza o objeto page para a lista refletir a exclusão imediatamente
+                            db.session.refresh(page)
+                            
+                            success = "Foto removida com sucesso!"
+                            logger.info(f"Foto {photo_id} removida de {slug}")
+                        else:
+                            error = "Erro ao remover: Foto não encontrada ou sem permissão."
+                    except ValueError:
+                        error = "ID de foto inválido."
                 
-                db.session.commit()
-                logger.info(f"Edição salva em Login: {slug}. Fotos novas: {files_processed}")
-                success = "Página atualizada com sucesso!"
+                # --- Ação B: SALVAR DADOS E UPLOAD (Se não for exclusão) ---
+                else:
+                    # 1. Atualizar Textos
+                    page.title = request.form.get('titulo', page.title).strip()
+                    page.message = request.form.get('mensagem', page.message).strip()
+                    page.background_color = request.form.get('cor_fundo', page.background_color)
+                    
+                    # 2. Atualizar Spotify
+                    new_spotify = request.form.get('spotify_url', '').strip()
+                    if new_spotify:
+                        page.spotify_url = ensure_embed_url(new_spotify)
+                    
+                    # 3. Atualizar ORDEM das fotos existentes
+                    # Varre todos os campos que começam com 'order_'
+                    for key, value in request.form.items():
+                        if key.startswith('order_'):
+                            try:
+                                photo_id_str = key.split('_')[1]
+                                photo_id = int(photo_id_str)
+                                new_order = int(value)
+                                
+                                # Busca foto específica para atualizar ordem
+                                photo = PagePhoto.query.get(photo_id)
+                                if photo and photo.page_id == page.id:
+                                    photo.display_order = new_order
+                            except (ValueError, IndexError):
+                                pass # Ignora erros de parse
+
+                    # 4. Uploads (Flask -> Directus -> Postgres)
+                    uploaded_files = request.files.getlist('fotos')
+                    files_processed = 0
+                    
+                    for file in uploaded_files:
+                        if file and file.filename:
+                            directus_url = upload_file_to_directus(file)
+                            if directus_url:
+                                new_photo = PagePhoto(
+                                    page_id=page.id,
+                                    image_url=directus_url,
+                                    display_order=99 # Joga pro final
+                                )
+                                db.session.add(new_photo)
+                                files_processed += 1
+                    
+                    db.session.commit()
+                    # Atualiza o objeto page também após salvar uploads/ordem
+                    db.session.refresh(page)
+                    
+                    logger.info(f"Edição salva em Login: {slug}. Fotos novas: {files_processed}")
+                    success = "Página atualizada com sucesso!"
                 
             except Exception as e:
                 db.session.rollback()
-                logger.error(f"Erro ao salvar edição: {e}")
-                error = "Erro ao salvar. Tente novamente."
+                logger.error(f"Erro geral no POST: {e}")
+                error = "Erro ao processar sua solicitação. Tente novamente."
 
-    # Renderiza o template login.html passando a variável 'is_logged_in' para controlar o que aparece
+    # Ordena as fotos na visualização (garante que a ordem nova seja mostrada)
+    # A lista page.photos agora está atualizada graças ao db.session.refresh(page)
+    if page.photos:
+        page.photos.sort(key=lambda x: x.display_order)
+
     return render_template(
         'login.html', 
         slug=slug, 
-        page=page, # Passa o objeto 'page' completo (com title, photos, etc)
+        page=page, 
         is_logged_in=is_logged_in,
         error=error,
         success=success,
@@ -360,12 +403,10 @@ def health_check():
 # ============================================================================
 
 if __name__ == '__main__':
-    # Em produção, o Gunicorn que vai chamar o app, mas isso ajuda no dev local
     if not os.path.exists(app.config['SESSION_FILE_DIR']):
         os.makedirs(app.config['SESSION_FILE_DIR'])
 
     with app.app_context():
-        # Cria tabelas se não existirem (Apenas para garantir, ideal é usar Migrations depois)
         try:
             db.create_all()
         except Exception as e:

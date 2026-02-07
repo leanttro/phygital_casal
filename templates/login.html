@@ -7,6 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+
     <style>
         .sortable-ghost {
             opacity: 0.4;
@@ -29,6 +32,37 @@
         .color-preset:hover {
             transform: scale(1.1);
         }
+        /* Ajuste do Driver.js */
+        .driver-popover.driverjs-theme {
+            background-color: #ffffff;
+            color: #1f2937;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .driver-popover.driverjs-theme .driver-popover-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #db2777;
+            margin-bottom: 8px;
+        }
+        .driver-popover.driverjs-theme .driver-popover-description {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #4b5563;
+        }
+        .driver-popover.driverjs-theme button {
+            background-color: #db2777;
+            color: #ffffff;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            text-shadow: none;
+        }
+        .driver-popover.driverjs-theme button:hover {
+            background-color: #be185d;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans text-gray-800">
@@ -39,11 +73,15 @@
                 QR Code <i data-lucide="heart" class="w-6 h-6 mx-2 fill-current"></i> Love
             </div>
             {% if is_logged_in %}
-            <div class="flex items-center space-x-4">
-                 <a href="{{ url_for('love_page', slug=page.slug) }}" target="_blank" class="text-sm text-gray-500 hover:text-pink-600 flex items-center">
+            <div class="flex items-center space-x-3">
+                 <button onclick="startTour()" class="text-gray-400 hover:text-pink-600 transition p-2 rounded-full hover:bg-pink-50" title="Ajuda / Como editar">
+                    <i data-lucide="circle-alert" class="w-5 h-5"></i>
+                </button>
+                
+                 <a href="{{ url_for('love_page', slug=page.slug) }}" target="_blank" class="text-sm text-gray-500 hover:text-pink-600 flex items-center px-3 py-2 rounded-lg hover:bg-gray-50 transition">
                     <i data-lucide="external-link" class="w-4 h-4 mr-1"></i> Ver Página
                 </a>
-                <a href="{{ url_for('logout', slug=page.slug) }}" class="text-sm text-red-500 hover:text-red-700 font-medium">Sair</a>
+                <a href="{{ url_for('logout', slug=page.slug) }}" class="text-sm text-red-500 hover:text-red-700 font-medium px-3 py-2">Sair</a>
             </div>
             {% endif %}
         </div>
@@ -73,25 +111,25 @@
                 
                 <form method="POST" enctype="multipart/form-data" class="p-6 space-y-6">
                     
-                    <div>
+                    <div id="tour-step-title">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Título da Página</label>
                         <input type="text" name="titulo" value="{{ page.title }}" required 
                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500 p-2 border">
                     </div>
 
-                    <div>
+                    <div id="tour-step-gallery-title">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Frase da Galeria</label>
                         <input type="text" name="gallery_title" value="{{ page.gallery_title }}" required 
                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500 p-2 border">
                     </div>
 
-                    <div>
+                    <div id="tour-step-message">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Sua Mensagem</label>
                         <textarea name="mensagem" rows="5" 
                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500 p-2 border">{{ page.message }}</textarea>
                     </div>
 
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div id="tour-step-style" class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                         <h3 class="font-bold text-gray-700 mb-4 flex items-center">
                             <i data-lucide="palette" class="w-4 h-4 mr-2"></i> Estilo & Tema
                         </h3>
@@ -134,7 +172,7 @@
                                 </select>
                             </div>
 
-                            <div class="md:col-span-2 mt-4">
+                            <div id="tour-step-colors" class="md:col-span-2 mt-4">
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Cor Principal de Fundo</label>
                                 <div class="flex flex-wrap items-center gap-2">
                                     <div class="color-preset" style="background: #FF6B8B;" onclick="updateColor('bg_input', '#FF6B8B')"></div>
@@ -166,7 +204,7 @@
                                 </div>
                             </div>
 
-                            <div class="md:col-span-2 mt-2 pt-2 border-t border-gray-200">
+                            <div id="tour-step-order" class="md:col-span-2 mt-2 pt-2 border-t border-gray-200">
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Ordem do Conteúdo</label>
                                 <p class="text-xs text-gray-400 mb-2">Arraste os itens para reorganizar a página:</p>
                                 
@@ -191,7 +229,7 @@
 
                     <hr class="border-gray-100">
 
-                    <div class="bg-pink-50/50 p-4 rounded-lg border border-pink-100">
+                    <div id="tour-step-timeline" class="bg-pink-50/50 p-4 rounded-lg border border-pink-100">
                         <label class="block text-sm font-bold text-gray-700 mb-3 flex items-center">
                             <i data-lucide="calendar" class="w-4 h-4 mr-2 text-pink-500"></i> Linha do Tempo (Datas Importantes)
                         </label>
@@ -242,7 +280,7 @@
 
                     <hr class="border-gray-100">
 
-                    <div>
+                    <div id="tour-step-spotify">
                         <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
                             <i data-lucide="music" class="w-4 h-4 mr-2 text-pink-500"></i> Escolher Música (Spotify)
                         </label>
@@ -273,7 +311,7 @@
                     </div>
                     <hr class="border-gray-100">
 
-                    <div>
+                    <div id="tour-step-photos">
                         <label class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                             <i data-lucide="image" class="w-4 h-4 mr-2 text-pink-500"></i> Galeria de Fotos (Máximo 4)
                         </label>
@@ -326,7 +364,7 @@
                         {% endif %}
                     </div>
 
-                    <div class="pt-4">
+                    <div class="pt-4" id="tour-step-save">
                         <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-all hover:scale-[1.01]">
                             <i data-lucide="save" class="w-5 h-5 mr-2"></i> Salvar Alterações
                         </button>
@@ -371,6 +409,71 @@
         function updateColor(id, val) {
             document.getElementById(id).value = val;
         }
+
+        // --- Configuração do TOUR (Driver.js) ---
+        const driver = window.driver.js.driver;
+        const tourDriver = driver({
+            showProgress: true,
+            nextBtnText: 'Próximo',
+            prevBtnText: 'Anterior',
+            doneBtnText: 'Entendi!',
+            steps: [
+                { 
+                    element: '#tour-step-title', 
+                    popover: { title: '1. Título', description: 'Comece definindo o título principal que aparecerá no topo da sua página.' } 
+                },
+                { 
+                    element: '#tour-step-message', 
+                    popover: { title: '2. Mensagem', description: 'Escreva uma mensagem especial para quem visitar sua página.' } 
+                },
+                { 
+                    element: '#tour-step-style', 
+                    popover: { title: '3. Estilo Visual', description: 'Escolha o tema, a fonte e o tamanho do texto que mais combinam com vocês.' } 
+                },
+                { 
+                    element: '#tour-step-colors', 
+                    popover: { 
+                        title: '4. Cores', 
+                        description: 'Escolha uma das cores sugeridas ou <b>clique no último bloco (seletor de cores)</b> para escolher EXATAMENTE a cor que você deseja.' 
+                    } 
+                },
+                { 
+                    element: '#tour-step-order', 
+                    popover: { title: '5. Organize', description: 'Arraste os itens para cima ou para baixo para mudar a ordem em que aparecem na página.' } 
+                },
+                { 
+                    element: '#tour-step-timeline', 
+                    popover: { title: '6. Nossa História', description: 'Adicione datas importantes (namoro, noivado, etc) para criar uma linha do tempo.' } 
+                },
+                { 
+                    element: '#tour-step-spotify', 
+                    popover: { title: '7. Trilha Sonora', description: 'Busque sua música favorita no Spotify para tocar na página.' } 
+                },
+                { 
+                    element: '#tour-step-photos', 
+                    popover: { title: '8. Fotos', description: 'Faça upload de até 4 fotos especiais.' } 
+                },
+                { 
+                    element: '#tour-step-save', 
+                    popover: { title: '9. Finalizar', description: 'Não esqueça de clicar aqui para salvar todas as suas alterações!' } 
+                }
+            ]
+        });
+
+        function startTour() {
+            tourDriver.drive();
+        }
+
+        // Inicia o tour automaticamente na primeira visita
+        {% if is_logged_in %}
+            document.addEventListener('DOMContentLoaded', function() {
+                if (!localStorage.getItem('hasSeenTour_v1')) {
+                    startTour();
+                    localStorage.setItem('hasSeenTour_v1', 'true');
+                }
+            });
+        {% endif %}
+        // ----------------------------------------
 
         // 1. Drag & Drop das FOTOS
         const grid = document.getElementById('photo-grid');

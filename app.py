@@ -240,7 +240,7 @@ def love_page(slug):
             return render_template('404.html', slug=slug), 404
         
         return render_template(
-            'love_page.html', # Você pode renomear index.html para love_page.html ou mudar aqui para index.html
+            'index.html', # Você pode renomear index.html para index.html ou mudar aqui para index.html
             page=page,
             current_year=datetime.now().year
         )

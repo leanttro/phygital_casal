@@ -1,0 +1,84 @@
+<!-- Rodapé -->
+<footer class="text-center py-6 animate-fade-in-up animation-delay-600">
+    <div class="flex flex-col md:flex-row items-center justify-between text-gray-600">
+        <div class="mb-4 md:mb-0">
+            <p class="text-sm">❤️ Criado com Phygital Love</p>
+            <!-- CORREÇÃO: Substituído now().year por variável do contexto -->
+            <p class="text-xs mt-1">
+                © {{ current_year if current_year else 2026 }} - Todos os momentos são especiais
+            </p>
+        </div>
+        
+        <!-- Link de admin discreto -->
+        {% if page.slug %}
+        <a href="/{{ page.slug }}/login" 
+           class="inline-flex items-center text-xs opacity-50 hover:opacity-80 transition-opacity duration-300 group">
+            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 group-hover:bg-gray-300 mr-2 transition">
+                <i data-lucide="lock" class="w-3 h-3"></i>
+            </div>
+            <span class="hidden md:inline">Editar Página</span>
+        </a>
+        {% endif %}
+    </div>
+</footer>
+
+<!-- Script para verificar/converter URL do Spotify -->
+<script>
+    // Verificação e conversão de URL do Spotify
+    document.addEventListener('DOMContentLoaded', function() {
+        const spotifyIframe = document.querySelector('iframe[src*="spotify.com"]');
+        
+        if (spotifyIframe) {
+            let src = spotifyIframe.src;
+            
+            // Verifica se já é uma URL embed
+            const isEmbed = src.includes('/embed/') || src.includes('embed.spotify.com');
+            
+            if (!isEmbed) {
+                console.warn('URL do Spotify não está no formato embed. Tentando converter...');
+                
+                // Padrões de URL do Spotify
+                const patterns = [
+                    /open\.spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/,
+                    /spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/
+                ];
+                
+                let converted = false;
+                
+                for (const pattern of patterns) {
+                    const match = src.match(pattern);
+                    if (match) {
+                        const type = match[1];
+                        const id = match[2];
+                        const embedUrl = `https://open.spotify.com/embed/${type}/${id}`;
+                        
+                        spotifyIframe.src = embedUrl;
+                        console.log('URL convertida para:', embedUrl);
+                        converted = true;
+                        break;
+                    }
+                }
+                
+                if (!converted) {
+                    console.error('Não foi possível converter a URL do Spotify:', src);
+                    
+                    // Fallback: Esconde o player se não puder converter
+                    const spotifyContainer = spotifyIframe.closest('.spotify-container');
+                    if (spotifyContainer) {
+                        spotifyContainer.innerHTML = `
+                            <div class="text-center p-6 text-gray-500">
+                                <i data-lucide="music-off" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
+                                <p>Playlist indisponível no momento</p>
+                            </div>
+                        `;
+                    }
+                }
+            }
+        }
+        
+        // Reinicializa ícones após modificações
+        if (typeof lucide !== 'undefined') {
+            setTimeout(() => lucide.createIcons(), 100);
+        }
+    });
+</script>

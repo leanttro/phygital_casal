@@ -131,7 +131,7 @@
             <div class="dynamic-text mx-auto leading-relaxed italic">
                 {{ page.message | replace('\n', '<br>') | safe }}
             </div>
-            <i data-lucide="quote" class="w-10 h-10 text-pink-300 mx-auto mt-6 opacity-50 rotate-180"></i>
+            <i data-lucide="quote" class="w-10 h-10 text-pink-300 mx-auto mt-3 opacity-50 rotate-180"></i>
         </section>
         {% endif %}
 
@@ -180,7 +180,7 @@
                             {% set parts = event.date.split('-') %}
                             {{ parts[2] }}/{{ parts[1] }}/{{ parts[0] }}
                         </span>
-                        <div class="w-12 h-1.5 mt-1.5 mb-2 rounded-full" style="background-color: {{ page.background_color }};"></div>
+                        <div class="w-10 h-4 mt-2 mb-2 rounded-sm" style="background-color: {{ page.background_color }};"></div>
                         <h3 class="text-xl font-bold mt-1" style="color: {{ page.background_color }};">{{ event.title }}</h3>
                     </div>
                 </div>

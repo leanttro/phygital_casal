@@ -224,6 +224,11 @@ def login_required(f):
 # ROTAS
 # ============================================================================
 
+@app.route('/')
+def home():
+    """Rota da Home (Para evitar 404 na raiz)"""
+    return redirect("https://leanttro.com")
+
 @app.route('/<slug>')
 def love_page(slug):
     """Rota Pública - Renderiza página do banco PostgreSQL"""
@@ -231,6 +236,7 @@ def love_page(slug):
         page = LovePage.query.filter_by(slug=slug).first()
         
         if not page:
+            # Se não achou no banco, renderiza o 404 personalizado
             return render_template('404.html', slug=slug), 404
         
         return render_template(

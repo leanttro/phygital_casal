@@ -106,7 +106,28 @@
                                            class="h-10 w-full rounded cursor-pointer border border-gray-300 p-1">
                                 </div>
                             </div>
-                        </div>
+
+                            <div class="md:col-span-2 mt-2 pt-2 border-t border-gray-200">
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Ordem do Conteúdo</label>
+                                <p class="text-xs text-gray-400 mb-2">Arraste os itens para reorganizar a página:</p>
+                                
+                                <input type="hidden" name="layout_order" id="layout_order_input" value="{{ page.layout_order }}">
+                                
+                                <div id="section-sort-list" class="space-y-2">
+                                    {% set section_labels = {'header': 'Capa & Título', 'text': 'Mensagem', 'spotify': 'Player de Música', 'photos': 'Galeria de Fotos', 'footer': 'Rodapé'} %}
+                                    {% set order_list = page.layout_order.split(',') %}
+                                    
+                                    {% for key in order_list %}
+                                        {% if key in section_labels %}
+                                        <div data-id="{{ key }}" class="bg-white p-3 border border-gray-200 rounded-md flex items-center cursor-move hover:border-pink-300 transition-colors shadow-sm select-none">
+                                            <i data-lucide="grip-vertical" class="w-4 h-4 mr-3 text-gray-300"></i>
+                                            <span class="text-sm font-medium text-gray-700">{{ section_labels[key] }}</span>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            </div>
                     </div>
 
                     <hr class="border-gray-100">
@@ -237,24 +258,39 @@
     <script>
         lucide.createIcons();
 
-        // --- Lógica de Drag & Drop (SortableJS) ---
+        // 1. Drag & Drop das FOTOS
         const grid = document.getElementById('photo-grid');
         if (grid) {
             new Sortable(grid, {
                 animation: 150,
                 ghostClass: 'sortable-ghost',
                 onEnd: function (evt) {
-                    // Quando soltar, recalcula os inputs hidden
                     const items = grid.querySelectorAll('.photo-item');
                     items.forEach((item, index) => {
                         const input = item.querySelector('.photo-order-input');
-                        if (input) {
-                            input.value = index + 1; // Define ordem (1, 2, 3...)
-                        }
-                        // Atualiza visualmente o texto "Foto #X" (opcional)
+                        if (input) input.value = index + 1;
                         const label = item.querySelector('span');
                         if(label) label.innerText = `Foto #${index + 1}`;
                     });
+                }
+            });
+        }
+
+        // 2. Drag & Drop das SEÇÕES (NOVO)
+        const sectionList = document.getElementById('section-sort-list');
+        if (sectionList) {
+            new Sortable(sectionList, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                onEnd: function (evt) {
+                    // Pega todos os IDs na nova ordem
+                    const items = sectionList.querySelectorAll('div[data-id]');
+                    let newOrder = [];
+                    items.forEach(item => {
+                        newOrder.push(item.getAttribute('data-id'));
+                    });
+                    // Atualiza o input hidden
+                    document.getElementById('layout_order_input').value = newOrder.join(',');
                 }
             });
         }

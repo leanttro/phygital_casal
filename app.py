@@ -345,6 +345,9 @@ def login(slug):
                     page.theme = request.form.get('theme', 'classic')
                     page.font_style = request.form.get('font_style', 'sans')
                     
+                    # === NOVO: Salva a Ordem das Seções ===
+                    page.layout_order = request.form.get('layout_order', page.layout_order)
+                    
                     # 3. Atualizar Spotify
                     new_spotify = request.form.get('spotify_url', '').strip()
                     if new_spotify:

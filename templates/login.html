@@ -3,100 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Editar Página | Phygital</title>
-    
+    <title>Área do Cliente | Phygital</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            pink: '#FF6B8B',
-                            dark: '#2D3748',
-                            light: '#F7FAFC'
-                        }
-                    },
-                    animation: {
-                        'fade-in-up': 'fadeInUp 0.5s ease-out',
-                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both'
-                    },
-                    keyframes: {
-                        fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(10px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        shake: {
-                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
-                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
-                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
-                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-pink-50 min-h-screen flex items-center justify-center p-4 font-sans text-gray-800">
+<body class="bg-gray-50 min-h-screen font-sans text-gray-800">
 
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden animate-fade-in-up">
-        
-        <div class="bg-white p-8 pb-6 text-center border-b border-gray-100">
-            <div class="mx-auto bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-brand-pink">
-                <i data-lucide="lock" class="w-8 h-8"></i>
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center text-pink-600 font-bold text-lg">
+                <i data-lucide="heart" class="w-6 h-6 mr-2 fill-current"></i>
+                Phygital Admin
             </div>
-            <h1 class="text-2xl font-bold text-gray-800 mb-2">Área de Edição</h1>
-            <p class="text-gray-500 text-sm">
-                Digite a senha para personalizar a página<br>
-                <span class="font-medium text-brand-pink">"{{ page_title }}"</span>
-            </p>
-        </div>
-
-        <div class="p-8 pt-6">
-            
-            {% if error %}
-            <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded animate-shake">
-                <div class="flex items-center">
-                    <i data-lucide="alert-circle" class="text-red-500 w-5 h-5 mr-2"></i>
-                    <p class="text-sm text-red-700 font-medium">{{ error }}</p>
-                </div>
+            {% if is_logged_in %}
+            <div class="flex items-center space-x-4">
+                 <a href="{{ url_for('love_page', slug=page.slug) }}" target="_blank" class="text-sm text-gray-500 hover:text-pink-600 flex items-center">
+                    <i data-lucide="external-link" class="w-4 h-4 mr-1"></i> Ver Página
+                </a>
+                <a href="{{ url_for('logout', slug=page.slug) }}" class="text-sm text-red-500 hover:text-red-700 font-medium">Sair</a>
             </div>
             {% endif %}
+        </div>
+    </nav>
 
-            <form method="POST" action="{{ url_for('login', slug=slug) }}" class="space-y-6">
+    <div class="max-w-3xl mx-auto py-10 px-4">
+
+        {% if error %}
+        <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 text-red-700 rounded shadow-sm flex items-center">
+            <i data-lucide="alert-circle" class="w-5 h-5 mr-2"></i> {{ error }}
+        </div>
+        {% endif %}
+        
+        {% if success %}
+        <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 text-green-700 rounded shadow-sm flex items-center">
+            <i data-lucide="check-circle" class="w-5 h-5 mr-2"></i> {{ success }}
+        </div>
+        {% endif %}
+
+        {% if is_logged_in %}
+            
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100 bg-gray-50">
+                    <h2 class="text-xl font-bold text-gray-800">Editar Página: {{ page.title }}</h2>
+                    <p class="text-sm text-gray-500 mt-1">Personalize os detalhes abaixo.</p>
+                </div>
                 
-                <div class="relative">
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha de Acesso</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                            <i data-lucide="key" class="w-5 h-5"></i>
-                        </div>
-                        <input type="password" 
-                               name="password" 
-                               id="password" 
-                               required
-                               placeholder="••••••••"
-                               class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-pink focus:border-brand-pink transition ease-in-out duration-150 sm:text-sm placeholder-gray-400">
+                <form method="POST" enctype="multipart/form-data" class="p-6 space-y-6">
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Título da Página</label>
+                        <input type="text" name="titulo" value="{{ page.title }}" required 
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500 p-2 border">
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Sua Mensagem</label>
+                        <textarea name="mensagem" rows="5" 
+                                  class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500 p-2 border">{{ page.message }}</textarea>
+                        <p class="text-xs text-gray-500 mt-1">Dica: Use emojis para deixar mais bonito! 💖</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cor de Fundo</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="color" name="cor_fundo" value="{{ page.background_color }}" 
+                                   class="h-10 w-20 rounded cursor-pointer border border-gray-300 p-1">
+                            <span class="text-sm text-gray-500">Clique na cor para alterar</span>
+                        </div>
+                    </div>
+
+                    <hr class="border-gray-100">
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                            <i data-lucide="music" class="w-4 h-4 mr-2 text-pink-500"></i> Link do Spotify
+                        </label>
+                        <input type="text" name="spotify_url" value="{{ page.spotify_url if page.spotify_url else '' }}" 
+                               placeholder="Cole o link da música ou playlist aqui..." 
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500 p-2 border">
+                        <p class="text-xs text-gray-500 mt-1">O sistema converte automaticamente para o player.</p>
+                    </div>
+
+                    <hr class="border-gray-100">
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+                            <i data-lucide="image" class="w-4 h-4 mr-2 text-pink-500"></i> Galeria de Fotos
+                        </label>
+                        
+                        <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:bg-gray-50 transition mb-4">
+                            <div class="space-y-1 text-center">
+                                <i data-lucide="upload-cloud" class="mx-auto h-12 w-12 text-gray-400"></i>
+                                <div class="flex text-sm text-gray-600 justify-center">
+                                    <label class="relative cursor-pointer bg-white rounded-md font-medium text-pink-600 hover:text-pink-500">
+                                        <span>Clique para enviar fotos</span>
+                                        <input name="fotos" type="file" multiple accept="image/*" class="sr-only">
+                                    </label>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG</p>
+                            </div>
+                        </div>
+                        
+                        {% if page.photos %}
+                        <div class="grid grid-cols-3 md:grid-cols-4 gap-4">
+                            {% for photo in page.photos %}
+                            <div class="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
+                                <img src="{{ photo.image_url }}" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                    <span class="text-white text-xs font-bold">Salva</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-all hover:scale-[1.01]">
+                            <i data-lucide="save" class="w-5 h-5 mr-2"></i> Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        {% else %}
+
+            <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden mt-10">
+                <div class="p-8 pb-6 text-center">
+                    <div class="mx-auto bg-pink-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-pink-500">
+                        <i data-lucide="lock" class="w-8 h-8"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900">Acesso Restrito</h2>
+                    <p class="text-gray-500 text-sm mt-2">
+                        Digite a senha para editar a página <br>
+                        <span class="font-medium text-pink-600">"{{ page.title }}"</span>
+                    </p>
                 </div>
 
-                <button type="submit" 
-                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-brand-pink hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-pink transition-all transform active:scale-95">
-                    Entrar no Painel
-                </button>
-            </form>
-        </div>
+                <form method="POST" class="p-8 pt-0 space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Senha de Acesso</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                <i data-lucide="key" class="w-5 h-5"></i>
+                            </div>
+                            <input type="password" name="password" required placeholder="••••••••"
+                                   class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 transition-all">
+                        </div>
+                    </div>
 
-        <div class="bg-gray-50 px-8 py-4 text-center border-t border-gray-100">
-            <a href="{{ url_for('love_page', slug=slug) }}" class="inline-flex items-center text-sm text-gray-500 hover:text-brand-pink transition">
-                <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i>
-                Voltar para a página pública
-            </a>
-        </div>
+                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-all">
+                        Entrar no Painel
+                    </button>
+                </form>
+                
+                <div class="bg-gray-50 px-8 py-4 text-center border-t border-gray-100">
+                    <a href="{{ url_for('love_page', slug=page.slug) }}" class="inline-flex items-center text-sm text-gray-500 hover:text-pink-600 transition">
+                        <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Voltar para a página
+                    </a>
+                </div>
+            </div>
+
+        {% endif %}
+        
     </div>
 
     <script>

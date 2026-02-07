@@ -198,27 +198,26 @@
                         </label>
 
                         <div id="timeline-sort-list" class="space-y-2 mb-6">
-                            {% if page.timeline_events %}
-                                {% for event in page.timeline_events %}
-                                <div class="timeline-item flex flex-col bg-white p-3 rounded border border-gray-200 shadow-sm cursor-move hover:border-pink-300 transition-all">
+                            {% if timeline_events %}
+                                {% for event in timeline_events %}
+                                <div class="timeline-item flex flex-col bg-white p-3 rounded border border-gray-200 shadow-sm transition-all">
                                     <div class="flex items-center justify-between mb-2">
                                         <div class="flex items-center text-gray-400">
-                                            <i data-lucide="grip-horizontal" class="w-4 h-4 mr-2"></i>
-                                            <span class="text-[10px] uppercase font-bold tracking-wider">Mudar Ordem</span>
+                                            <span class="text-[10px] uppercase font-bold tracking-wider">Marco #{{ loop.index }}</span>
                                         </div>
-                                        <button type="submit" name="delete_event_id" value="{{ event.id }}" class="text-red-400 hover:text-red-600 p-1" onclick="return confirm('Excluir este marco da história?');">
+                                        <button type="submit" name="delete_event_idx" value="{{ loop.index0 }}" class="text-red-400 hover:text-red-600 p-1" onclick="return confirm('Excluir este marco da história?');">
                                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                                         </button>
                                     </div>
                                     
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                                        <input type="hidden" name="event_id_{{ event.id }}" value="{{ event.id }}">
-                                        <input type="date" name="edit_event_date_{{ event.id }}" value="{{ event.event_date.strftime('%Y-%m-%d') }}" 
-                                               class="border-gray-200 rounded text-xs p-1 focus:ring-pink-500 border">
-                                        <input type="text" name="edit_event_title_{{ event.id }}" value="{{ event.event_title }}" 
-                                               class="md:col-span-2 border-gray-200 rounded text-xs p-1 focus:ring-pink-500 border">
+                                        <div class="text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded">
+                                            {{ event.date }}
+                                        </div>
+                                        <div class="md:col-span-2 text-xs text-gray-700 p-1">
+                                            {{ event.title }}
+                                        </div>
                                     </div>
-                                    <input type="hidden" class="timeline-order-input" name="event_order_{{ event.id }}" value="{{ loop.index }}">
                                 </div>
                                 {% endfor %}
                             {% else %}
@@ -405,22 +404,6 @@
                         newOrder.push(item.getAttribute('data-id'));
                     });
                     document.getElementById('layout_order_input').value = newOrder.join(',');
-                }
-            });
-        }
-
-        // 3. Drag & Drop da LINHA DO TEMPO
-        const timelineList = document.getElementById('timeline-sort-list');
-        if (timelineList) {
-            new Sortable(timelineList, {
-                animation: 150,
-                ghostClass: 'sortable-ghost',
-                onEnd: function (evt) {
-                    const items = timelineList.querySelectorAll('.timeline-item');
-                    items.forEach((item, index) => {
-                        const input = item.querySelector('.timeline-order-input');
-                        if (input) input.value = index + 1;
-                    });
                 }
             });
         }

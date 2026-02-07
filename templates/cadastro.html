@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Minha Página | Phygital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans text-gray-800 flex flex-col">
+
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center text-pink-600 font-bold text-lg">
+                <i data-lucide="heart" class="w-6 h-6 mr-2 fill-current"></i>
+                Phygital Love
+            </div>
+            <a href="/" class="text-sm text-gray-500 hover:text-pink-600">Voltar para Início</a>
+        </div>
+    </nav>
+
+    <div class="max-w-md mx-auto py-12 px-4 w-full">
+        <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+            <div class="p-8 pb-6 text-center border-b border-gray-50">
+                <h2 class="text-2xl font-bold text-gray-900">Comece sua história</h2>
+                <p class="text-gray-500 text-sm mt-2">Crie sua página personalizada em segundos.</p>
+            </div>
+
+            {% if error %}
+            <div class="m-6 mb-0 bg-red-50 border-l-4 border-red-500 p-4 text-red-700 text-sm flex items-center">
+                <i data-lucide="alert-circle" class="w-4 h-4 mr-2"></i> {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST" class="p-8 space-y-5">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nome</label>
+                        <input type="text" name="nome" required placeholder="Ex: João"
+                               class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Sobrenome</label>
+                        <input type="text" name="sobrenome" required placeholder="Ex: Silva"
+                               class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 transition-all">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">WhatsApp</label>
+                    <input type="text" name="whatsapp" required placeholder="(11) 99999-9999"
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 transition-all">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">URL da Página (Slug)</label>
+                    <div class="flex">
+                        <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                            phygital.com/
+                        </span>
+                        <input type="text" name="slug" required placeholder="nossa-historia"
+                               class="block flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-none rounded-r-lg focus:ring-pink-500 focus:border-pink-500 transition-all">
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-1 italic">Este será o link único da sua página.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Senha do Painel</label>
+                    <input type="password" name="admin_password" required placeholder="••••••••"
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 transition-all">
+                </div>
+
+                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 transition-all transform hover:scale-[1.01]">
+                    Criar Minha Página
+                </button>
+            </form>
+        </div>
+        
+        <p class="text-center text-gray-400 text-xs mt-8">
+            © {{ current_year }} Phygital Love - Eternizando Momentos
+        </p>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -103,6 +103,11 @@ class LovePage(db.Model):
     spotify_url = db.Column(db.String(500))
     admin_password = db.Column(db.String(100)) # Plaintext (conforme solicitado)
     
+    # NOVOS CAMPOS PARA CADASTRO
+    nome = db.Column(db.String(100))
+    sobrenome = db.Column(db.String(100))
+    whatsapp = db.Column(db.String(50))
+    
     # --- NOVOS CAMPOS PARA PERSONALIZAÇÃO ---
     theme = db.Column(db.String(50), default='classic') # ex: classic, elegant, modern
     font_style = db.Column(db.String(50), default='sans') # ex: sans, serif, handwriting
@@ -257,6 +262,49 @@ def login_required(f):
 def home():
     """Rota da Home (Para evitar 404 na raiz)"""
     return redirect("https://leanttro.com")
+
+@app.route('/cadastro', methods=['GET', 'POST'])
+def cadastro():
+    """Rota de Cadastro de novos usuários/páginas"""
+    error = None
+    if request.method == 'POST':
+        slug = request.form.get('slug', '').strip().lower()
+        nome = request.form.get('nome', '').strip()
+        sobrenome = request.form.get('sobrenome', '').strip()
+        whatsapp = request.form.get('whatsapp', '').strip()
+        password = request.form.get('admin_password', '').strip()
+
+        # Validação básica
+        if not re.match(r'^[a-z0-9-]+$', slug):
+            error = "O link deve conter apenas letras minúsculas, números e traços."
+        else:
+            # Verifica se o slug já existe
+            existing = LovePage.query.filter_by(slug=slug).first()
+            if existing:
+                error = "Este link já está em uso. Escolha outro."
+            else:
+                try:
+                    new_page = LovePage(
+                        slug=slug,
+                        nome=nome,
+                        sobrenome=sobrenome,
+                        whatsapp=whatsapp,
+                        admin_password=password,
+                        title=f"Página de {nome}",
+                        message="Bem-vindos à nossa história de amor!"
+                    )
+                    db.session.add(new_page)
+                    db.session.commit()
+                    
+                    # Loga o usuário automaticamente após cadastro
+                    session['admin_slug'] = slug
+                    return redirect(url_for('login', slug=slug))
+                except Exception as e:
+                    db.session.rollback()
+                    logger.error(f"Erro no cadastro: {e}")
+                    error = "Erro ao criar conta. Tente novamente."
+
+    return render_template('cadastro.html', error=error, current_year=datetime.now().year)
 
 @app.route('/<slug>')
 def love_page(slug):

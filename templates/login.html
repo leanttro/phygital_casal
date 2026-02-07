@@ -127,6 +127,14 @@
                                 </select>
                             </div>
 
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Proporção das Fotos</label>
+                                <select name="aspect_ratio" class="w-full border-gray-300 rounded p-2 focus:ring-pink-500 focus:border-pink-500 bg-white">
+                                    <option value="square" {% if page.aspect_ratio == 'square' %}selected{% endif %}>Quadrada (1:1)</option>
+                                    <option value="story" {% if page.aspect_ratio == 'story' %}selected{% endif %}>Story (9:16)</option>
+                                </select>
+                            </div>
+
                             <div class="md:col-span-2 mt-4">
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Cor Principal de Fundo</label>
                                 <div class="flex flex-wrap items-center gap-2">
@@ -217,10 +225,10 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
-                            <i data-lucide="image" class="w-4 h-4 mr-2 text-pink-500"></i> Galeria de Fotos
+                            <i data-lucide="image" class="w-4 h-4 mr-2 text-pink-500"></i> Galeria de Fotos (Máximo 4)
                         </label>
                         
-                        <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:bg-gray-50 transition mb-4 relative">
+                        <div id="upload-container" class="{% if page.photos|length >= 4 %}hidden{% endif %} flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:bg-gray-50 transition mb-4 relative">
                             <div class="space-y-1 text-center">
                                 <i data-lucide="upload-cloud" class="mx-auto h-12 w-12 text-gray-400"></i>
                                 <div class="flex text-sm text-gray-600 justify-center">
@@ -354,6 +362,16 @@
         // Script para mostrar quantos arquivos foram selecionados no upload
         function updateFileCount(input) {
             const msg = document.getElementById('file-count-msg');
+            const currentPhotos = document.querySelectorAll('.photo-item').length;
+            const maxAllowed = 4 - currentPhotos;
+
+            if (input.files.length > maxAllowed) {
+                alert(`Você só pode adicionar mais ${maxAllowed} foto(s).`);
+                input.value = "";
+                msg.classList.add('hidden');
+                return;
+            }
+
             if (input.files && input.files.length > 0) {
                 msg.textContent = `${input.files.length} foto(s) pronta(s) para enviar! Clique em Salvar.`;
                 msg.classList.remove('hidden');

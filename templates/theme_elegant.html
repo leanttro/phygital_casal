@@ -30,38 +30,59 @@
         /* Custom Swiper Styles */
         .swiper {
             width: 100%;
-            padding-top: 50px;
+            padding-top: 30px;
             padding-bottom: 50px;
         }
 
         .swiper-slide {
             background-position: center;
             background-size: cover;
-            width: 300px;
-            height: 400px;
+            /* Lógica de Proporção Dinâmica */
+            {% if page.aspect_ratio == 'story' %}
+                width: 280px;
+                height: 497px; /* 9:16 approx */
+            {% else %}
+                width: 320px;
+                height: 320px; /* 1:1 Quadrada */
+            {% endif %}
             border-radius: 1.5rem;
             box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        /* Correção Mobile */
+        @media (max-width: 640px) {
+            .swiper-slide {
+                {% if page.aspect_ratio == 'story' %}
+                    width: 240px;
+                    height: 426px;
+                {% else %}
+                    width: 260px;
+                    height: 260px;
+                {% endif %}
+            }
         }
 
         .swiper-slide img {
             display: block;
             width: 100%;
             height: 100%;
-            object-cover: cover;
+            object-fit: cover; /* ESSENCIAL PARA NÃO DISTORCER */
             border-radius: 1.5rem;
         }
 
         .swiper-button-next, .swiper-button-prev {
             color: {{ page.title_color }};
             background: rgba(255, 255, 255, 0.8);
-            width: 50px;
-            height: 50px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             backdrop-filter: blur(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .swiper-button-next:after, .swiper-button-prev:after {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
         }
     </style>
@@ -80,14 +101,14 @@
             </div>
             {% endif %}
             
-            <div class="relative z-10 text-center p-8 bg-white/80 backdrop-blur-md rounded-xl shadow-2xl max-w-2xl mx-4 border border-white/50">
-                <div class="mb-4 text-pink-600 animate-bounce">
+            <div class="relative z-10 text-center p-8 backdrop-blur-md rounded-xl shadow-2xl max-w-2xl mx-4 border border-white/50" style="background-color: {{ page.title_color }};">
+                <div class="mb-4 animate-bounce" style="color: {{ page.font_color }};">
                     <i data-lucide="heart" class="w-8 h-8 mx-auto fill-current"></i>
                 </div>
-                <h1 class="text-4xl md:text-6xl font-bold mb-4 dynamic-title leading-tight">
+                <h1 class="text-3xl md:text-5xl font-bold mb-4 leading-tight" style="color: {{ page.font_color }};">
                     {{ page.title }}
                 </h1>
-                <div class="w-24 h-1 bg-pink-500 mx-auto rounded-full"></div>
+                <div class="w-24 h-1 mx-auto rounded-full" style="background-color: {{ page.font_color }};"></div>
             </div>
         </header>
         {% endif %}
@@ -131,15 +152,15 @@
 
         {% if section == 'photos' and page.photos %}
         <section class="py-20 px-4">
-            <div class="text-center mb-12">
+            <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold mb-2 dynamic-title">{{ page.gallery_title }}</h2>
                 <div class="w-12 h-1 bg-gray-300 mx-auto"></div>
             </div>
             
-            <div class="max-w-6xl mx-auto relative px-10">
+            <div class="max-w-6xl mx-auto relative px-4">
                 <div class="swiper mySwiper">
                     <div class="swiper-wrapper">
-                        {% for photo in page.photos[:3] %}
+                        {% for photo in page.photos[:4] %}
                         <div class="swiper-slide">
                             <img src="{{ photo.image_url }}" alt="Momento {{ loop.index }}">
                         </div>
@@ -177,9 +198,9 @@
             centeredSlides: true,
             slidesPerView: "auto",
             coverflowEffect: {
-                rotate: 50,
+                rotate: 30,
                 stretch: 0,
-                depth: 100,
+                depth: 200,
                 modifier: 1,
                 slideShadows: true,
             },

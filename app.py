@@ -105,7 +105,7 @@ class LovePage(db.Model):
     # --- NOVOS CAMPOS PARA PERSONALIZAÇÃO ---
     theme = db.Column(db.String(50), default='classic') # ex: classic, elegant, modern
     font_style = db.Column(db.String(50), default='sans') # ex: sans, serif, handwriting
-    layout_order = db.Column(db.Text, default='header,text,spotify,photos,footer')
+    layout_order = db.Column(db.Text, default='header,text,spotify,timeline,photos,footer')
     
     # NOVAS ADIÇÕES SOLICITADAS:
     gallery_title = db.Column(db.String(200), default='Nossa Galeria')
@@ -118,6 +118,8 @@ class LovePage(db.Model):
     
     # Relacionamento One-to-Many com fotos
     photos = db.relationship('PagePhoto', backref='page', lazy=True, cascade="all, delete-orphan", order_by="PagePhoto.display_order")
+    # Relacionamento com a Timeline
+    timeline_events = db.relationship('PageTimeline', backref='page', lazy=True, cascade="all, delete-orphan", order_by="PageTimeline.event_date")
 
 class PagePhoto(db.Model):
     __tablename__ = 'page_photos'
@@ -127,6 +129,14 @@ class PagePhoto(db.Model):
     image_url = db.Column(db.String(500), nullable=False) # URL do Directus
     display_order = db.Column(db.Integer, default=0)
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class PageTimeline(db.Model):
+    __tablename__ = 'page_timeline'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    page_id = db.Column(db.Integer, db.ForeignKey('love_pages.id'), nullable=False)
+    event_date = db.Column(db.Date, nullable=False)
+    event_title = db.Column(db.String(200), nullable=False)
 
 # ============================================================================
 # HELPER FUNCTIONS - DIRECTUS & UPLOAD
@@ -326,6 +336,9 @@ def login(slug):
                 # --- Ação A: EXCLUIR FOTO ---
                 delete_id = request.form.get('delete_photo_id')
                 
+                # --- NOVO: EXCLUIR EVENTO TIMELINE ---
+                delete_event_id = request.form.get('delete_event_id')
+
                 if delete_id:
                     try:
                         photo_id = int(delete_id)
@@ -342,6 +355,20 @@ def login(slug):
                             error = "Erro ao remover: Foto não encontrada ou sem permissão."
                     except ValueError:
                         error = "ID de foto inválido."
+
+                elif delete_event_id:
+                    try:
+                        event_id = int(delete_event_id)
+                        event_to_delete = PageTimeline.query.get(event_id)
+                        if event_to_delete and event_to_delete.page_id == page.id:
+                            db.session.delete(event_to_delete)
+                            db.session.commit()
+                            db.session.refresh(page)
+                            success = "Evento da linha do tempo removido!"
+                        else:
+                            error = "Evento não encontrado."
+                    except ValueError:
+                        error = "ID de evento inválido."
                 
                 # --- Ação B: SALVAR DADOS E UPLOAD (Se não for exclusão) ---
                 else:
@@ -370,6 +397,21 @@ def login(slug):
                     new_spotify = request.form.get('spotify_url', '').strip()
                     if new_spotify:
                         page.spotify_url = ensure_embed_url(new_spotify)
+
+                    # --- NOVO: Adicionar Evento na Timeline ---
+                    new_event_date = request.form.get('new_event_date')
+                    new_event_title = request.form.get('new_event_title')
+                    if new_event_date and new_event_title:
+                        try:
+                            event_date_obj = datetime.strptime(new_event_date, '%Y-%m-%d').date()
+                            new_event = PageTimeline(
+                                page_id=page.id,
+                                event_date=event_date_obj,
+                                event_title=new_event_title.strip()
+                            )
+                            db.session.add(new_event)
+                        except ValueError:
+                            error = "Formato de data inválido para o evento."
                     
                     # 4. Atualizar ORDEM das fotos existentes
                     for key, value in request.form.items():

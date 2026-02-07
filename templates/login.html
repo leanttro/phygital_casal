@@ -174,7 +174,7 @@
                                 <input type="hidden" name="layout_order" id="layout_order_input" value="{{ page.layout_order }}">
                                 
                                 <div id="section-sort-list" class="space-y-2">
-                                    {% set section_labels = {'header': 'Capa & Título', 'text': 'Mensagem', 'spotify': 'Player de Música', 'photos': 'Galeria de Fotos', 'footer': 'Rodapé'} %}
+                                    {% set section_labels = {'header': 'Capa & Título', 'text': 'Mensagem', 'spotify': 'Player de Música', 'timeline': 'Linha do Tempo', 'photos': 'Galeria de Fotos', 'footer': 'Rodapé'} %}
                                     {% set order_list = page.layout_order.split(',') %}
                                     
                                     {% for key in order_list %}
@@ -188,6 +188,46 @@
                                 </div>
                             </div>
                             </div>
+                    </div>
+
+                    <hr class="border-gray-100">
+
+                    <div class="bg-pink-50/50 p-4 rounded-lg border border-pink-100">
+                        <label class="block text-sm font-bold text-gray-700 mb-3 flex items-center">
+                            <i data-lucide="calendar" class="w-4 h-4 mr-2 text-pink-500"></i> Linha do Tempo (Datas Importantes)
+                        </label>
+
+                        <div class="space-y-2 mb-4">
+                            {% if page.timeline_events %}
+                                {% for event in page.timeline_events %}
+                                <div class="flex items-center justify-between bg-white p-2 rounded border border-gray-200 shadow-sm">
+                                    <div class="flex items-center">
+                                        <span class="text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded mr-3">
+                                            {{ event.event_date.strftime('%d/%m/%Y') }}
+                                        </span>
+                                        <span class="text-sm text-gray-700">{{ event.event_title }}</span>
+                                    </div>
+                                    <button type="submit" name="delete_event_id" value="{{ event.id }}" class="text-red-400 hover:text-red-600 p-1" onclick="return confirm('Excluir este marco da história?');">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-xs text-gray-400 italic">Nenhum evento adicionado ainda.</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div class="flex flex-col">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1 mb-1">Data</label>
+                                <input type="date" name="new_event_date" class="border-gray-300 rounded-lg text-sm p-2 border focus:ring-pink-500">
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1 mb-1">Título do Momento</label>
+                                <input type="text" name="new_event_title" placeholder="Ex: Nosso primeiro beijo" class="border-gray-300 rounded-lg text-sm p-2 border focus:ring-pink-500">
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-gray-400 mt-2 italic">* Preencha os dois campos e clique em Salvar para adicionar à linha do tempo.</p>
                     </div>
 
                     <hr class="border-gray-100">

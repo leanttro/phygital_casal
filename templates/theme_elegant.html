@@ -85,6 +85,18 @@
             font-size: 1.2rem;
             font-weight: bold;
         }
+
+        /* Estilos da Linha do Tempo */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -9px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: {{ page.title_color }};
+            opacity: 0.2;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -150,6 +162,31 @@
         </section>
         {% endif %}
 
+        {% if section == 'timeline' and page.timeline_events %}
+        <section class="py-20 px-4 max-w-3xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-2 dynamic-title">Nossa História</h2>
+                <div class="w-12 h-1 bg-gray-300 mx-auto"></div>
+            </div>
+
+            <div class="space-y-8 ml-4 border-l-2 border-gray-100">
+                {% for event in page.timeline_events %}
+                <div class="relative pl-8 timeline-item">
+                    <div class="absolute left-[-21px] top-0 w-10 h-10 bg-white rounded-full border-2 flex items-center justify-center shadow-sm" style="border-color: {{ page.title_color }};">
+                        <i data-lucide="calendar" class="w-4 h-4" style="color: {{ page.title_color }};"></i>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-50">
+                        <span class="text-xs font-bold uppercase tracking-widest opacity-50" style="color: {{ page.font_color }};">
+                            {{ event.event_date.strftime('%d/%m/%Y') }}
+                        </span>
+                        <h3 class="text-xl font-bold mt-1 dynamic-title">{{ event.event_title }}</h3>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
         {% if section == 'photos' and page.photos %}
         <section class="pt-20 pb-10 px-4">
             <div class="text-center mb-8">
@@ -198,8 +235,7 @@
             centeredSlides: true,
             slidesPerView: "auto",
             loop: true,
-            loopedSlides: 8,
-            loopAdditionalSlides: 8,
+            loopAdditionalSlides: 4,
             coverflowEffect: {
                 rotate: 20,
                 stretch: 0,

@@ -197,37 +197,49 @@
                             <i data-lucide="calendar" class="w-4 h-4 mr-2 text-pink-500"></i> Linha do Tempo (Datas Importantes)
                         </label>
 
-                        <div class="space-y-2 mb-4">
+                        <div id="timeline-sort-list" class="space-y-2 mb-6">
                             {% if page.timeline_events %}
                                 {% for event in page.timeline_events %}
-                                <div class="flex items-center justify-between bg-white p-2 rounded border border-gray-200 shadow-sm">
-                                    <div class="flex items-center">
-                                        <span class="text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded mr-3">
-                                            {{ event.event_date.strftime('%d/%m/%Y') }}
-                                        </span>
-                                        <span class="text-sm text-gray-700">{{ event.event_title }}</span>
+                                <div class="timeline-item flex flex-col bg-white p-3 rounded border border-gray-200 shadow-sm cursor-move hover:border-pink-300 transition-all">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center text-gray-400">
+                                            <i data-lucide="grip-horizontal" class="w-4 h-4 mr-2"></i>
+                                            <span class="text-[10px] uppercase font-bold tracking-wider">Mudar Ordem</span>
+                                        </div>
+                                        <button type="submit" name="delete_event_id" value="{{ event.id }}" class="text-red-400 hover:text-red-600 p-1" onclick="return confirm('Excluir este marco da história?');">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
                                     </div>
-                                    <button type="submit" name="delete_event_id" value="{{ event.id }}" class="text-red-400 hover:text-red-600 p-1" onclick="return confirm('Excluir este marco da história?');">
-                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                    </button>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                        <input type="hidden" name="event_id_{{ event.id }}" value="{{ event.id }}">
+                                        <input type="date" name="edit_event_date_{{ event.id }}" value="{{ event.event_date.strftime('%Y-%m-%d') }}" 
+                                               class="border-gray-200 rounded text-xs p-1 focus:ring-pink-500 border">
+                                        <input type="text" name="edit_event_title_{{ event.id }}" value="{{ event.event_title }}" 
+                                               class="md:col-span-2 border-gray-200 rounded text-xs p-1 focus:ring-pink-500 border">
+                                    </div>
+                                    <input type="hidden" class="timeline-order-input" name="event_order_{{ event.id }}" value="{{ loop.index }}">
                                 </div>
                                 {% endfor %}
                             {% else %}
-                                <p class="text-xs text-gray-400 italic">Nenhum evento adicionado ainda.</p>
+                                <p class="text-xs text-gray-400 italic text-center py-4">Nenhum evento adicionado ainda.</p>
                             {% endif %}
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <div class="flex flex-col">
-                                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1 mb-1">Data</label>
-                                <input type="date" name="new_event_date" class="border-gray-300 rounded-lg text-sm p-2 border focus:ring-pink-500">
-                            </div>
-                            <div class="flex flex-col">
-                                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1 mb-1">Título do Momento</label>
-                                <input type="text" name="new_event_title" placeholder="Ex: Nosso primeiro beijo" class="border-gray-300 rounded-lg text-sm p-2 border focus:ring-pink-500">
+                        <div class="bg-white/60 p-3 rounded-lg border border-dashed border-pink-200">
+                            <p class="text-[10px] font-bold text-pink-400 uppercase mb-2">Adicionar Novo Marco</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <div class="flex flex-col">
+                                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1 mb-1">Data</label>
+                                    <input type="date" name="new_event_date" class="border-gray-300 rounded-lg text-sm p-2 border focus:ring-pink-500">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1 mb-1">Título do Momento</label>
+                                    <input type="text" name="new_event_title" placeholder="Ex: Nosso primeiro beijo" class="border-gray-300 rounded-lg text-sm p-2 border focus:ring-pink-500">
+                                </div>
                             </div>
                         </div>
-                        <p class="text-[10px] text-gray-400 mt-2 italic">* Preencha os dois campos e clique em Salvar para adicionar à linha do tempo.</p>
+                        <p class="text-[10px] text-gray-400 mt-3 italic text-center">* Altere as informações acima e clique no botão <b>Salvar Alterações</b> ao final da página.</p>
                     </div>
 
                     <hr class="border-gray-100">
@@ -326,7 +338,7 @@
 
         {% else %}
 
-            <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden mt-10">
+            <div class="max-md mx-auto bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden mt-10">
                 <div class="p-8 pb-6 text-center">
                     <div class="mx-auto bg-pink-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-pink-500">
                         <i data-lucide="lock" class="w-8 h-8"></i>
@@ -380,26 +392,39 @@
             });
         }
 
-        // 2. Drag & Drop das SEÇÕES (NOVO)
+        // 2. Drag & Drop das SEÇÕES
         const sectionList = document.getElementById('section-sort-list');
         if (sectionList) {
             new Sortable(sectionList, {
                 animation: 150,
                 ghostClass: 'sortable-ghost',
                 onEnd: function (evt) {
-                    // Pega todos os IDs na nova ordem
                     const items = sectionList.querySelectorAll('div[data-id]');
                     let newOrder = [];
                     items.forEach(item => {
                         newOrder.push(item.getAttribute('data-id'));
                     });
-                    // Atualiza o input hidden
                     document.getElementById('layout_order_input').value = newOrder.join(',');
                 }
             });
         }
 
-        // Script para mostrar quantos arquivos foram selecionados no upload
+        // 3. Drag & Drop da LINHA DO TEMPO (NOVO)
+        const timelineList = document.getElementById('timeline-sort-list');
+        if (timelineList) {
+            new Sortable(timelineList, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                onEnd: function (evt) {
+                    const items = timelineList.querySelectorAll('.timeline-item');
+                    items.forEach((item, index) => {
+                        const input = item.querySelector('.timeline-order-input');
+                        if (input) input.value = index + 1;
+                    });
+                }
+            });
+        }
+
         function updateFileCount(input) {
             const msg = document.getElementById('file-count-msg');
             const currentPhotos = document.querySelectorAll('.photo-item').length;
@@ -420,7 +445,6 @@
             }
         }
 
-        // Lógica de Busca do Spotify
         async function searchSpotify() {
             const query = document.getElementById('spotify_query').value;
             const resultsDiv = document.getElementById('spotify_results');
@@ -433,16 +457,13 @@
             try {
                 const response = await fetch(`/api/spotify-search?q=${encodeURIComponent(query)}`);
                 const data = await response.json();
-                
-                resultsDiv.innerHTML = ''; // Limpa anterior
+                resultsDiv.innerHTML = ''; 
 
                 if (data.results && data.results.length > 0) {
                     data.results.forEach(track => {
-                        // Cria o elemento visual da música
                         const el = document.createElement('div');
                         el.className = "flex items-center p-2 hover:bg-pink-50 cursor-pointer rounded border border-gray-100 transition";
                         el.onclick = () => selectTrack(track.embed_url, track.name);
-                        
                         el.innerHTML = `
                             <img src="${track.image_url}" class="w-10 h-10 rounded mr-3 bg-gray-200">
                             <div class="flex-1 overflow-hidden">
@@ -457,22 +478,15 @@
                 } else {
                     resultsDiv.innerHTML = '<p class="text-sm text-gray-500">Nenhuma música encontrada.</p>';
                 }
-
             } catch (error) {
-                console.error(error);
                 resultsDiv.innerHTML = '<p class="text-sm text-red-500">Erro ao buscar. Tente novamente.</p>';
             }
         }
 
         function selectTrack(url, name) {
-            // 1. Atualiza o input oculto (que vai pro banco)
             document.getElementById('real_spotify_url').value = url;
-            
-            // 2. Limpa a busca
             document.getElementById('spotify_results').classList.add('hidden');
             document.getElementById('spotify_query').value = '';
-            
-            // 3. Atualiza o Preview
             const previewDiv = document.getElementById('spotify_preview');
             previewDiv.innerHTML = `
                 <p class="text-xs text-green-600 mb-2 font-bold uppercase flex items-center">

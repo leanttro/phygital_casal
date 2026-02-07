@@ -112,6 +112,7 @@ class LovePage(db.Model):
     font_color = db.Column(db.String(20), default='#374151') 
     title_color = db.Column(db.String(20), default='#111827')
     font_size = db.Column(db.String(20), default='medium') # small, medium, large
+    aspect_ratio = db.Column(db.String(20), default='square') # square ou story
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
@@ -354,6 +355,7 @@ def login(slug):
                     page.font_color = request.form.get('font_color', page.font_color)
                     page.title_color = request.form.get('title_color', page.title_color)
                     page.font_size = request.form.get('font_size', page.font_size)
+                    page.aspect_ratio = request.form.get('aspect_ratio', page.aspect_ratio)
                     
                     # 2. Atualizar Configurações de TEMA
                     page.theme = request.form.get('theme', 'classic')

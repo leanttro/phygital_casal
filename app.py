@@ -107,6 +107,12 @@ class LovePage(db.Model):
     font_style = db.Column(db.String(50), default='sans') # ex: sans, serif, handwriting
     layout_order = db.Column(db.Text, default='header,text,spotify,photos,footer')
     
+    # NOVAS ADIÇÕES SOLICITADAS:
+    gallery_title = db.Column(db.String(200), default='Nossa Galeria')
+    font_color = db.Column(db.String(20), default='#374151') 
+    title_color = db.Column(db.String(20), default='#111827')
+    font_size = db.Column(db.String(20), default='medium') # small, medium, large
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relacionamento One-to-Many com fotos
@@ -258,23 +264,28 @@ def love_page(slug):
             return render_template('404.html', slug=slug), 404
         
         # --- LÓGICA DE TEMAS ---
-        # Se o tema for 'elegant', usa o template novo. Caso contrário, usa o padrão.
         template_name = 'theme_elegant.html' if page.theme == 'elegant' else 'index.html'
         
-        # --- LÓGICA DE FONTES ---
-        # Mapeia o nome do banco para o CSS real
+        # --- LÓGICA DE FONTES E TAMANHOS ---
         fonts_map = {
             'sans': 'Inter, sans-serif',
             'serif': 'Playfair Display, serif',
             'handwriting': 'Great Vibes, cursive',
             'mono': 'Fira Code, monospace'
         }
-        font_css = fonts_map.get(page.font_style, 'sans-serif')
+        
+        # Mapeamento de tamanhos para Tailwind/CSS
+        size_map = {
+            'small': '1.0rem',
+            'medium': '1.25rem',
+            'large': '1.75rem'
+        }
 
         return render_template(
             template_name,
             page=page,
-            font_css=font_css,
+            font_css=fonts_map.get(page.font_style, 'sans-serif'),
+            font_size_val=size_map.get(page.font_size, '1.25rem'),
             current_year=datetime.now().year
         )
     except Exception as e:
@@ -323,10 +334,7 @@ def login(slug):
                         if photo_to_delete and photo_to_delete.page_id == page.id:
                             db.session.delete(photo_to_delete)
                             db.session.commit()
-                            
-                            # CRÍTICO: Atualiza o objeto page para a lista refletir a exclusão imediatamente
                             db.session.refresh(page)
-                            
                             success = "Foto removida com sucesso!"
                             logger.info(f"Foto {photo_id} removida de {slug}")
                         else:
@@ -341,12 +349,17 @@ def login(slug):
                     page.message = request.form.get('mensagem', page.message).strip()
                     page.background_color = request.form.get('cor_fundo', page.background_color)
                     
+                    # NOVAS CONFIGURAÇÕES DE PERSONALIZAÇÃO
+                    page.gallery_title = request.form.get('gallery_title', page.gallery_title).strip()
+                    page.font_color = request.form.get('font_color', page.font_color)
+                    page.title_color = request.form.get('title_color', page.title_color)
+                    page.font_size = request.form.get('font_size', page.font_size)
+                    
                     # 2. Atualizar Configurações de TEMA
                     page.theme = request.form.get('theme', 'classic')
                     page.font_style = request.form.get('font_style', 'sans')
                     
                     # === NOVO: Salva a Ordem das Seções ===
-                    # Importante: O .get() retorna a nova ordem enviada pelo input hidden
                     new_layout = request.form.get('layout_order')
                     if new_layout:
                         page.layout_order = new_layout
@@ -357,20 +370,17 @@ def login(slug):
                         page.spotify_url = ensure_embed_url(new_spotify)
                     
                     # 4. Atualizar ORDEM das fotos existentes
-                    # Varre todos os campos que começam com 'order_'
                     for key, value in request.form.items():
                         if key.startswith('order_'):
                             try:
                                 photo_id_str = key.split('_')[1]
                                 photo_id = int(photo_id_str)
                                 new_order = int(value)
-                                
-                                # Busca foto específica
                                 photo = PagePhoto.query.get(photo_id)
                                 if photo and photo.page_id == page.id:
                                     photo.display_order = new_order
                             except (ValueError, IndexError):
-                                pass # Ignora erros de parse
+                                pass
 
                     # 5. Uploads (Flask -> Directus -> Postgres)
                     uploaded_files = request.files.getlist('fotos')
@@ -383,13 +393,12 @@ def login(slug):
                                 new_photo = PagePhoto(
                                     page_id=page.id,
                                     image_url=directus_url,
-                                    display_order=99 # Joga pro final
+                                    display_order=99
                                 )
                                 db.session.add(new_photo)
                                 files_processed += 1
                     
                     db.session.commit()
-                    # Atualiza o objeto page após commit
                     db.session.refresh(page)
                     
                     logger.info(f"Edição salva em Login: {slug}. Fotos novas: {files_processed}")
@@ -438,23 +447,16 @@ def health_check():
         status['db'] = str(e)
     return jsonify(status)
 
-# ============================================================================
-# INICIALIZAÇÃO & MIGRAÇÃO AUTOMÁTICA
-# ============================================================================
-
 if __name__ == '__main__':
-    # Garante que a pasta de sessão existe (útil em dev local)
     if not os.path.exists(app.config['SESSION_FILE_DIR']):
         os.makedirs(app.config['SESSION_FILE_DIR'])
 
     with app.app_context():
-        # 1. Cria tabelas se não existirem
         try:
             db.create_all()
         except Exception as e:
             logger.error(f"Erro ao inicializar DB: {e}")
 
-    # Inicia o servidor (Em produção, o Gunicorn assume daqui)
     app.run(
         host='0.0.0.0',
         port=int(os.getenv('PORT', 5000)),

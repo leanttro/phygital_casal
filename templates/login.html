@@ -16,6 +16,19 @@
         .sortable-drag {
             cursor: grabbing;
         }
+        /* Estilo para os quadradinhos de cores */
+        .color-preset {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px #e5e7eb;
+            transition: transform 0.2s;
+        }
+        .color-preset:hover {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans text-gray-800">
@@ -68,6 +81,12 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Frase da Galeria</label>
+                        <input type="text" name="gallery_title" value="{{ page.gallery_title }}" required 
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500 p-2 border">
+                    </div>
+
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Sua Mensagem</label>
                         <textarea name="mensagem" rows="5" 
                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500 p-2 border">{{ page.message }}</textarea>
@@ -99,11 +118,44 @@
                                 </select>
                             </div>
 
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Cor Principal de Fundo</label>
-                                <div class="flex items-center space-x-2">
-                                    <input type="color" name="cor_fundo" value="{{ page.background_color }}" 
-                                           class="h-10 w-full rounded cursor-pointer border border-gray-300 p-1">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tamanho da Fonte</label>
+                                <select name="font_size" class="w-full border-gray-300 rounded p-2 focus:ring-pink-500 focus:border-pink-500 bg-white">
+                                    <option value="small" {% if page.font_size == 'small' %}selected{% endif %}>Pequeno</option>
+                                    <option value="medium" {% if page.font_size == 'medium' %}selected{% endif %}>Médio</option>
+                                    <option value="large" {% if page.font_size == 'large' %}selected{% endif %}>Grande</option>
+                                </select>
+                            </div>
+
+                            <div class="md:col-span-2 mt-4">
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Cor Principal de Fundo</label>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <div class="color-preset" style="background: #FF6B8B;" onclick="updateColor('bg_input', '#FF6B8B')"></div>
+                                    <div class="color-preset" style="background: #ffffff;" onclick="updateColor('bg_input', '#ffffff')"></div>
+                                    <div class="color-preset" style="background: #1a202c;" onclick="updateColor('bg_input', '#1a202c')"></div>
+                                    <div class="color-preset" style="background: #FDF2F2;" onclick="updateColor('bg_input', '#FDF2F2')"></div>
+                                    <input type="color" id="bg_input" name="cor_fundo" value="{{ page.background_color }}" 
+                                           class="h-10 w-16 rounded cursor-pointer border border-gray-300 p-1">
+                                </div>
+                            </div>
+
+                            <div class="md:col-span-1 mt-2">
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Cor dos Títulos</label>
+                                <div class="flex items-center gap-2">
+                                    <div class="color-preset" style="background: #111827;" onclick="updateColor('title_input', '#111827')"></div>
+                                    <div class="color-preset" style="background: #db2777;" onclick="updateColor('title_input', '#db2777')"></div>
+                                    <input type="color" id="title_input" name="title_color" value="{{ page.title_color }}" 
+                                           class="h-8 w-12 rounded cursor-pointer border border-gray-300 p-1">
+                                </div>
+                            </div>
+
+                            <div class="md:col-span-1 mt-2">
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Cor do Texto</label>
+                                <div class="flex items-center gap-2">
+                                    <div class="color-preset" style="background: #374151;" onclick="updateColor('font_input', '#374151')"></div>
+                                    <div class="color-preset" style="background: #6b7280;" onclick="updateColor('font_input', '#6b7280')"></div>
+                                    <input type="color" id="font_input" name="font_color" value="{{ page.font_color }}" 
+                                           class="h-8 w-12 rounded cursor-pointer border border-gray-300 p-1">
                                 </div>
                             </div>
 
@@ -257,6 +309,10 @@
 
     <script>
         lucide.createIcons();
+
+        function updateColor(id, val) {
+            document.getElementById(id).value = val;
+        }
 
         // 1. Drag & Drop das FOTOS
         const grid = document.getElementById('photo-grid');

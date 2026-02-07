@@ -40,22 +40,22 @@
             /* Lógica de Proporção Dinâmica */
             {% if page.aspect_ratio == 'story' %}
                 width: 280px;
-                height: 497px; /* 9:16 approx */
+                height: 497px; /* 9:16 vertical */
             {% else %}
                 width: 320px;
-                height: 320px; /* 1:1 Quadrada */
+                height: 320px; /* 1:1 quadrada */
             {% endif %}
             border-radius: 1.5rem;
             box-shadow: 0 15px 50px rgba(0,0,0,0.2);
             overflow: hidden;
         }
 
-        /* Correção Mobile */
+        /* Ajuste Mobile para garantir que não saia da tela */
         @media (max-width: 640px) {
             .swiper-slide {
                 {% if page.aspect_ratio == 'story' %}
-                    width: 240px;
-                    height: 426px;
+                    width: 220px;
+                    height: 391px;
                 {% else %}
                     width: 260px;
                     height: 260px;
@@ -67,7 +67,7 @@
             display: block;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* ESSENCIAL PARA NÃO DISTORCER */
+            object-fit: cover;
             border-radius: 1.5rem;
         }
 
@@ -198,9 +198,9 @@
             centeredSlides: true,
             slidesPerView: "auto",
             coverflowEffect: {
-                rotate: 30,
+                rotate: 20,
                 stretch: 0,
-                depth: 200,
+                depth: 150,
                 modifier: 1,
                 slideShadows: true,
             },

@@ -286,8 +286,11 @@ def love_page(slug):
             'large': '1.75rem'
         }
 
-        # Converte JSON da timeline para lista para o template
-        timeline_list = json.loads(page.timeline_data) if page.timeline_data else []
+        # --- CORREÇÃO DO JSON ---
+        if isinstance(page.timeline_data, list):
+            timeline_list = page.timeline_data
+        else:
+            timeline_list = json.loads(page.timeline_data) if page.timeline_data else []
 
         return render_template(
             template_name,
@@ -331,8 +334,11 @@ def login(slug):
         # --- CASO 2: Ações do Painel (Salvar, Excluir, Ordenar) ---
         elif is_logged_in:
             try:
-                # Carrega timeline atual do JSON
-                current_timeline = json.loads(page.timeline_data) if page.timeline_data else []
+                # --- CORREÇÃO DO JSON ---
+                if isinstance(page.timeline_data, list):
+                    current_timeline = page.timeline_data
+                else:
+                    current_timeline = json.loads(page.timeline_data) if page.timeline_data else []
 
                 # --- Ação A: EXCLUIR FOTO ---
                 delete_id = request.form.get('delete_photo_id')
@@ -454,8 +460,11 @@ def login(slug):
     if page.photos:
         page.photos.sort(key=lambda x: x.display_order)
 
-    # Decodifica a timeline para exibir no painel
-    timeline_display = json.loads(page.timeline_data) if page.timeline_data else []
+    # --- CORREÇÃO DO JSON PARA O LOGIN ---
+    if isinstance(page.timeline_data, list):
+        timeline_display = page.timeline_data
+    else:
+        timeline_display = json.loads(page.timeline_data) if page.timeline_data else []
 
     return render_template(
         'login.html', 

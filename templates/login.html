@@ -73,12 +73,39 @@
                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500 p-2 border">{{ page.message }}</textarea>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Cor de Fundo</label>
-                        <div class="flex items-center space-x-2">
-                            <input type="color" name="cor_fundo" value="{{ page.background_color }}" 
-                                   class="h-10 w-20 rounded cursor-pointer border border-gray-300 p-1">
-                            <span class="text-sm text-gray-500">Toque para escolher</span>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h3 class="font-bold text-gray-700 mb-4 flex items-center">
+                            <i data-lucide="palette" class="w-4 h-4 mr-2"></i> Estilo & Tema
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Modelo da Página</label>
+                                <select name="theme" class="w-full border-gray-300 rounded p-2 focus:ring-pink-500 focus:border-pink-500 bg-white">
+                                    <option value="classic" {% if page.theme == 'classic' %}selected{% endif %}>Clássico (Original)</option>
+                                    <option value="elegant" {% if page.theme == 'elegant' %}selected{% endif %}>Elegante (Casamento/Novela)</option>
+                                    <option value="modern" {% if page.theme == 'modern' %}selected{% endif %}>Moderno (Em breve)</option>
+                                    <option value="broken" {% if page.theme == 'broken' %}selected{% endif %}>Heartbreak (Em breve)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Estilo da Fonte</label>
+                                <select name="font_style" class="w-full border-gray-300 rounded p-2 focus:ring-pink-500 focus:border-pink-500 bg-white">
+                                    <option value="sans" {% if page.font_style == 'sans' %}selected{% endif %}>Padrão (Sans Serif)</option>
+                                    <option value="serif" {% if page.font_style == 'serif' %}selected{% endif %}>Clássica (Serif)</option>
+                                    <option value="handwriting" {% if page.font_style == 'handwriting' %}selected{% endif %}>Manuscrita (Romântica)</option>
+                                    <option value="mono" {% if page.font_style == 'mono' %}selected{% endif %}>Máquina de Escrever</option>
+                                </select>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Cor Principal de Fundo</label>
+                                <div class="flex items-center space-x-2">
+                                    <input type="color" name="cor_fundo" value="{{ page.background_color }}" 
+                                           class="h-10 w-full rounded cursor-pointer border border-gray-300 p-1">
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -232,7 +259,7 @@
             });
         }
 
-        // Script para mostrar quantos arquivos foram selecionados
+        // Script para mostrar quantos arquivos foram selecionados no upload
         function updateFileCount(input) {
             const msg = document.getElementById('file-count-msg');
             if (input.files && input.files.length > 0) {

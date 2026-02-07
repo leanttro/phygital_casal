@@ -127,11 +127,11 @@
 
         {% if section == 'text' %}
         <section class="pt-2 pb-10 px-4 max-w-3xl mx-auto text-center">
-            <i data-lucide="quote" class="w-10 h-10 text-pink-300 mx-auto mb-1.5 opacity-50"></i>
+            <i data-lucide="quote" class="w-10 h-10 text-pink-300 mx-auto mb-1 opacity-50"></i>
             <div class="dynamic-text mx-auto leading-relaxed italic">
                 {{ page.message | replace('\n', '<br>') | safe }}
             </div>
-            <i data-lucide="quote" class="w-10 h-10 text-pink-300 mx-auto mt-3 opacity-50 rotate-180"></i>
+            <i data-lucide="quote" class="w-10 h-10 text-pink-300 mx-auto mt-2 opacity-50 rotate-180"></i>
         </section>
         {% endif %}
 
@@ -163,7 +163,7 @@
         {% endif %}
 
         {% if section == 'timeline' and timeline_events %}
-        <section class="py-20 px-4 max-w-3xl mx-auto">
+        <section class="py-2 px-4 max-w-3xl mx-auto">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold mb-2 dynamic-title">Nossa História</h2>
                 <div class="w-12 h-1 bg-gray-300 mx-auto"></div>
@@ -176,11 +176,12 @@
                         <i data-lucide="calendar" class="w-4 h-4" style="color: {{ page.title_color }};"></i>
                     </div>
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-50">
-                        <span class="text-xs font-bold uppercase tracking-widest opacity-50" style="color: {{ page.font_color }};">
-                            {% set parts = event.date.split('-') %}
-                            {{ parts[2] }}/{{ parts[1] }}/{{ parts[0] }}
-                        </span>
-                        <div class="w-10 h-4 mt-2 mb-2 rounded-sm" style="background-color: {{ page.background_color }};"></div>
+                        <div class="inline-block px-4 py-1.5 rounded-lg mb-3" style="background-color: {{ page.background_color }};">
+                            <span class="text-xs font-bold uppercase tracking-widest text-white">
+                                {% set parts = event.date.split('-') %}
+                                {{ parts[2] }}/{{ parts[1] }}/{{ parts[0] }}
+                            </span>
+                        </div>
                         <h3 class="text-xl font-bold mt-1" style="color: {{ page.background_color }};">{{ event.title }}</h3>
                     </div>
                 </div>

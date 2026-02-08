@@ -17,7 +17,7 @@
                         wine: {
                             800: '#9D174D', // Vinho vibrante
                             900: '#831843', // Vinho profundo
-                            950: '#500724'  // Vinho escuro (loading)
+                            950: '#500724'  // Vinho escuro
                         },
                         neon: {
                             pink: '#FF007F',
@@ -30,16 +30,11 @@
                         'float-fast': 'float 3s ease-in-out infinite',
                         'pulse-intense': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'spin-slow': 'spin 12s linear infinite',
-                        'fade-out-up': 'fadeOutUp 0.8s forwards ease-in-out',
                     },
                     keyframes: {
                         float: {
                             '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
                             '50%': { transform: 'translateY(-25px) rotate(5deg)' },
-                        },
-                        fadeOutUp: {
-                            '0%': { opacity: 1, transform: 'translateY(0)' },
-                            '100%': { opacity: 0, transform: 'translateY(-100%)', visibility: 'hidden' },
                         }
                     }
                 }
@@ -78,35 +73,9 @@
 	        50% { background-position: 100% 50%; }
 	        100% { background-position: 0% 50%; }
         }
-
-        /* Preloader Styles */
-        #preloader {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background-color: #500724; /* Vinho escuro */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease;
-        }
-        #preloader.loaded {
-            animation: fadeOutUp 0.8s forwards ease-in-out;
-            pointer-events: none;
-        }
     </style>
 </head>
 <body class="bg-gray-50 antialiased overflow-x-hidden">
-
-    <div id="preloader">
-        <div class="text-center animate-pulse-intense">
-            <div class="flex items-center justify-center text-white font-black text-4xl md:text-5xl tracking-tighter">
-                QR Code <i data-lucide="heart" class="w-10 h-10 mx-3 fill-neon-pink text-neon-pink"></i> Love
-            </div>
-            <p class="text-pink-200 mt-4 text-sm uppercase tracking-[0.3em] font-bold">Carregando...</p>
-        </div>
-    </div>
-
 
     <nav class="fixed w-full z-40 transition-all duration-500 py-4" id="mainNav">
         <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
@@ -399,31 +368,6 @@
     <script>
         // Inicializa Ícones
         lucide.createIcons();
-
-        // ===============================================
-        // SOLUÇÃO DO LOADING OTIMIZADO (MAX 2.5 SEGUNDOS)
-        // ===============================================
-        
-        const preloader = document.getElementById('preloader');
-        
-        function removePreloader() {
-            if (preloader && !preloader.classList.contains('loaded')) {
-                preloader.classList.add('loaded');
-                document.body.style.overflowY = 'auto'; // Libera o scroll
-            }
-        }
-
-        // Tenta remover assim que o DOM carregar (rápido)
-        document.addEventListener("DOMContentLoaded", function() {
-            setTimeout(removePreloader, 1500); // 1.5s mínimo para o logo
-        });
-
-        // FALLBACK DE SEGURANÇA: Limite máximo
-        setTimeout(removePreloader, 2500);
-        
-        // Bloqueia scroll inicialmente
-        document.body.style.overflowY = 'hidden';
-
 
         // --- SCRIPT DE NAVBAR DINÂMICA ---
         const nav = document.getElementById('mainNav');

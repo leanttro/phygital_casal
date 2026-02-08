@@ -1,89 +1,324 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Minha Página | QR Code Love</title>
+    <title>Crie sua Página Phygital | QR Code Love</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            pink: '#FF6B8B',
+                            dark: '#111827',
+                            light: '#F9FAFB'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Utilitários de Animação ao Scroll */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans text-gray-800 flex flex-col">
+<body class="bg-gray-50 text-gray-900 overflow-x-hidden antialiased">
 
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center text-pink-600 font-bold text-lg">
-                QR Code <i data-lucide="heart" class="w-6 h-6 mx-2 fill-current"></i> Love
+    <nav class="fixed w-full z-50 transition-all duration-300 glass border-b border-gray-100/50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center text-brand-pink font-bold text-xl tracking-tight">
+                QR Code <i data-lucide="heart" class="w-6 h-6 mx-2 fill-current animate-pulse"></i> Love
             </div>
-            <a href="/" class="text-sm text-gray-500 hover:text-pink-600">Voltar para Início</a>
+            <a href="#criar" class="bg-brand-dark text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-all hover:scale-105 shadow-lg">
+                Começar Agora
+            </a>
         </div>
     </nav>
 
-    <div class="max-w-md mx-auto py-12 px-4 w-full">
-        <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-            <div class="p-8 pb-6 text-center border-b border-gray-50">
-                <h2 class="text-2xl font-bold text-gray-900">Comece sua história</h2>
-                <p class="text-gray-500 text-sm mt-2">Crie sua página personalizada em segundos.</p>
+    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-tr from-pink-200 to-purple-200 rounded-full blur-3xl opacity-30 -z-10 animate-pulse-slow"></div>
+
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <div class="reveal">
+                <span class="inline-block py-1 px-3 rounded-full bg-pink-100 text-pink-600 text-xs font-bold uppercase tracking-widest mb-6">
+                    Novo Phygital Love
+                </span>
+                <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 mb-6 leading-tight">
+                    Eternize seu amor <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-600">no mundo digital.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+                    Mais que um site. Uma experiência imersiva com <strong>sua trilha sonora do Spotify</strong>, timeline da sua história e galeria de fotos. Tudo conectado a um QR Code.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="#criar" class="w-full sm:w-auto px-8 py-4 bg-pink-600 text-white rounded-full font-bold text-lg shadow-xl shadow-pink-500/30 hover:bg-pink-700 hover:scale-105 transition-all">
+                        Criar Minha Página Grátis
+                    </a>
+                    <a href="#como-funciona" class="w-full sm:w-auto px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-full font-medium hover:bg-gray-50 transition-all flex items-center justify-center">
+                        <i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Ver Vídeo
+                    </a>
+                </div>
             </div>
-
-            {% if error %}
-            <div class="m-6 mb-0 bg-red-50 border-l-4 border-red-500 p-4 text-red-700 text-sm flex items-center">
-                <i data-lucide="alert-circle" class="w-4 h-4 mr-2"></i> {{ error }}
-            </div>
-            {% endif %}
-
-            <form method="POST" class="p-8 space-y-5">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nome</label>
-                        <input type="text" name="nome" required placeholder="Ex: Leandro"
-                               class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Sobrenome</label>
-                        <input type="text" name="sobrenome" required placeholder="Ex: Andrade"
-                               class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 transition-all">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">WhatsApp</label>
-                    <input type="text" name="whatsapp" required placeholder="(11) 91332-4827"
-                           class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 transition-all">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">URL da Página (Slug)</label>
-                    <div class="flex">
-                        <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-400 text-[10px] md:text-xs whitespace-nowrap">
-                            qrcodebrindes.leanttro.com/
-                        </span>
-                        <input type="text" name="slug" required placeholder="nossa-historia"
-                               class="block flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-none rounded-r-lg focus:ring-pink-500 focus:border-pink-500 transition-all">
-                    </div>
-                    <p class="text-[10px] text-gray-400 mt-1 italic">Este será o link único da sua página.</p>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Senha do Painel</label>
-                    <input type="password" name="admin_password" required placeholder="••••••••"
-                           class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 transition-all">
-                </div>
-
-                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 transition-all transform hover:scale-[1.01]">
-                    Criar Minha Página
-                </button>
-            </form>
         </div>
-        
-        <p class="text-center text-gray-400 text-xs mt-8">
-            <a href="https://www.qrcodebrindes.com.br" target="_blank" class="hover:text-pink-600 transition-colors">
-                Feito por ♥ www.QRCODEBRINDES.com.br
-            </a>
-        </p>
-    </div>
+    </header>
+
+    <section id="como-funciona" class="py-10 px-4">
+        <div class="max-w-5xl mx-auto reveal">
+            <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white aspect-video bg-black group">
+                <video 
+                    class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" 
+                    autoplay muted loop playsinline
+                    poster="https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?q=80&w=2576&auto=format&fit=crop">
+                    <source src="SEU_LINK_DO_VIDEO_CLOUDINARY_AQUI.mp4" type="video/mp4">
+                    Seu navegador não suporta vídeos.
+                </video>
+                
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-full border border-white/20">
+                        <i data-lucide="play" class="w-8 h-8 text-white fill-white"></i>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center text-sm text-gray-400 mt-4">Assista como é fácil criar e personalizar.</p>
+        </div>
+    </section>
+
+    <section class="py-24 bg-gray-900 text-white overflow-hidden">
+        <div class="max-w-6xl mx-auto px-6">
+            
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-5xl font-bold mb-4">Poderoso. Emocionante. Único.</h2>
+                <p class="text-gray-400 max-w-xl mx-auto">Design digno de app, sem precisar instalar nada. Funciona direto no navegador.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-center">
+                
+                <div class="reveal delay-100 flex flex-col items-center">
+                    <div class="relative w-64 h-[500px] bg-gray-800 rounded-[2.5rem] border-8 border-gray-700 shadow-2xl overflow-hidden animate-float">
+                        <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="mt-6 text-xl font-bold">Painel Intuitivo</h3>
+                    <p class="text-gray-400 text-center text-sm mt-2">Arraste fotos, escolha músicas e mude cores em tempo real.</p>
+                </div>
+
+                <div class="reveal delay-200 flex flex-col items-center mt-12 md:mt-0">
+                    <div class="relative w-72 h-[550px] bg-gray-800 rounded-[2.5rem] border-8 border-gray-700 shadow-2xl shadow-pink-500/20 overflow-hidden transform md:-translate-y-12">
+                         <img src="https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover">
+                        
+                        <div class="absolute bottom-6 left-0 right-0 text-center">
+                            <span class="bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-xs font-bold">Tema Elegante</span>
+                        </div>
+                    </div>
+                    <h3 class="mt-6 text-xl font-bold text-pink-400">Design Premium</h3>
+                    <p class="text-gray-400 text-center text-sm mt-2">Layouts pensados para emocionar quem recebe.</p>
+                </div>
+
+                <div class="reveal delay-300 flex flex-col items-center">
+                    <div class="relative w-64 h-[500px] bg-gray-800 rounded-[2.5rem] border-8 border-gray-700 shadow-2xl overflow-hidden animate-float" style="animation-delay: 1s;">
+                         <img src="https://images.unsplash.com/photo-1529636721198-4c3780053cc2?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="mt-6 text-xl font-bold">100% Personalizável</h3>
+                    <p class="text-gray-400 text-center text-sm mt-2">Integração nativa com Spotify e Galeria Inteligente.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="criar" class="py-24 relative bg-gray-50">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+
+        <div class="max-w-4xl mx-auto px-4 relative z-10">
+            
+            <div class="text-center mb-10 reveal">
+                <h2 class="text-3xl font-bold text-gray-900">Comece Agora. É Grátis.</h2>
+                <p class="text-gray-500 mt-2">Preencha os dados abaixo para gerar seu painel administrativo.</p>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 reveal">
+                <div class="grid grid-cols-1 md:grid-cols-5">
+                    
+                    <div class="bg-gray-900 p-10 text-white md:col-span-2 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-pink-600 to-purple-700 opacity-90"></div>
+                        <div class="relative z-10">
+                            <h3 class="text-xl font-bold mb-6">O que está incluso?</h3>
+                            <ul class="space-y-4 text-sm">
+                                <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-pink-300"></i> Hospedagem Grátis</li>
+                                <li class="flex items-center"><i data-lucide="music" class="w-5 h-5 mr-3 text-pink-300"></i> Integração Spotify</li>
+                                <li class="flex items-center"><i data-lucide="image" class="w-5 h-5 mr-3 text-pink-300"></i> Galeria de Fotos</li>
+                                <li class="flex items-center"><i data-lucide="shield-check" class="w-5 h-5 mr-3 text-pink-300"></i> Painel com Senha</li>
+                            </ul>
+                        </div>
+                        <div class="relative z-10 mt-10">
+                            <div class="flex -space-x-2">
+                                <img class="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/100?img=1" alt="">
+                                <img class="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/100?img=5" alt="">
+                                <img class="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/100?img=8" alt="">
+                                <div class="w-8 h-8 rounded-full border-2 border-white bg-gray-800 text-[10px] flex items-center justify-center">+2k</div>
+                            </div>
+                            <p class="text-xs text-pink-100 mt-2">Junte-se a mais de 2.000 casais.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-10 md:col-span-3">
+                        
+                        {% if error %}
+                        <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 text-red-700 text-sm rounded flex items-center animate-pulse">
+                            <i data-lucide="alert-triangle" class="w-5 h-5 mr-2"></i> {{ error }}
+                        </div>
+                        {% endif %}
+
+                        <form method="POST" class="space-y-5">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Seu Nome</label>
+                                    <input type="text" name="nome" required placeholder="Ex: Lucas"
+                                           class="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Sobrenome</label>
+                                    <input type="text" name="sobrenome" required placeholder="Ex: Silva"
+                                           class="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all outline-none">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">WhatsApp</label>
+                                <div class="relative">
+                                    <i data-lucide="phone" class="absolute left-3 top-3.5 w-4 h-4 text-gray-400"></i>
+                                    <input type="text" name="whatsapp" required placeholder="(11) 99999-9999"
+                                           class="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all outline-none">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Link Personalizado (Slug)</label>
+                                <div class="flex rounded-xl shadow-sm">
+                                    <span class="inline-flex items-center px-4 rounded-l-xl border border-r-0 border-gray-200 bg-gray-100 text-gray-500 text-xs font-mono">
+                                        leanttro.com/
+                                    </span>
+                                    <input type="text" name="slug" id="slugInput" required placeholder="maria-e-joao"
+                                           class="block flex-1 min-w-0 px-4 py-3 border border-gray-200 rounded-r-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none bg-white font-bold text-gray-700">
+                                </div>
+                                <p class="text-[11px] text-gray-400 mt-1 ml-1">Dica: Use nomes curtos sem acentos. O sistema ajusta automático.</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Crie uma Senha</label>
+                                <div class="relative">
+                                    <i data-lucide="lock" class="absolute left-3 top-3.5 w-4 h-4 text-gray-400"></i>
+                                    <input type="password" name="admin_password" required placeholder="Mínimo 6 caracteres"
+                                           class="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all outline-none">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full flex items-center justify-center py-4 px-6 border border-transparent rounded-xl shadow-lg text-base font-bold text-white bg-pink-600 hover:bg-pink-700 transition-all transform hover:scale-[1.02] active:scale-95 group">
+                                <span>Criar Página Agora</span>
+                                <i data-lucide="arrow-right" class="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                            </button>
+                            
+                            <p class="text-center text-xs text-gray-400 mt-4">
+                                Ao criar, você concorda com nossos termos de uso.
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-white border-t border-gray-100 py-12 mt-12">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <div class="flex justify-center items-center text-pink-600 font-bold text-xl mb-4">
+                QR Code <i data-lucide="heart" class="w-5 h-5 mx-2 fill-current"></i> Love
+            </div>
+            <p class="text-gray-400 text-sm mb-6">
+                A plataforma número #1 para presentes digitais românticos.
+            </p>
+            <div class="text-xs text-gray-300">
+                <a href="https://www.qrcodebrindes.com.br" target="_blank" class="hover:text-pink-600 transition-colors font-medium">
+                    Desenvolvido por QRCODEBRINDES.com.br
+                </a>
+                <span class="mx-2">•</span>
+                <span>{{ current_year }}</span>
+            </div>
+        </div>
+    </footer>
 
     <script>
+        // Inicializa Ícones
         lucide.createIcons();
+
+        // 1. Script para Limpeza Automática do SLUG (UX Importante)
+        const slugInput = document.getElementById('slugInput');
+        if (slugInput) {
+            slugInput.addEventListener('keyup', function(e) {
+                // Remove acentos, espaços e caracteres especiais em tempo real
+                let val = this.value.toString().toLowerCase()
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, "") // Remove acentos
+                    .replace(/\s+/g, '-')           // Espaço vira traço
+                    .replace(/[^\w\-]+/g, '')       // Remove caracteres não alfanuméricos
+                    .replace(/\-\-+/g, '-')         // Remove múltiplos traços
+                    .replace(/^-+/, '')             // Remove traço do início
+                    .replace(/-+$/, '');            // Remove traço do fim
+                
+                this.value = val;
+            });
+        }
+
+        // 2. Script de Animação ao Scroll (Intersection Observer)
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach((el) => {
+            observer.observe(el);
+        });
     </script>
 </body>
 </html>

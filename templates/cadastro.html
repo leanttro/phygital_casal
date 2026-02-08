@@ -28,9 +28,9 @@
                         'float-slow': 'float 8s ease-in-out infinite',
                         'float-medium': 'float 5s ease-in-out infinite reverse',
                         'float-fast': 'float 3s ease-in-out infinite',
-                        'pulse-intense': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'pulse-intense': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'spin-slow': 'spin 12s linear infinite',
-                        'fade-out-up': 'fadeOutUp 1s forwards ease-in-out',
+                        'fade-out-up': 'fadeOutUp 0.8s forwards ease-in-out', /* Acelerado para 0.8s */
                     },
                     keyframes: {
                         float: {
@@ -88,9 +88,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: opacity 0.5s ease;
         }
         #preloader.loaded {
-            animation: fadeOutUp 1.2s forwards ease-in-out;
+            animation: fadeOutUp 0.8s forwards ease-in-out;
             pointer-events: none;
         }
     </style>
@@ -99,10 +100,10 @@
 
     <div id="preloader">
         <div class="text-center animate-pulse-intense">
-            <div class="flex items-center justify-center text-white font-black text-4md md:text-5xl tracking-tighter">
+            <div class="flex items-center justify-center text-white font-black text-4xl md:text-5xl tracking-tighter">
                 QR Code <i data-lucide="heart" class="w-10 h-10 mx-3 fill-neon-pink text-neon-pink"></i> Love
             </div>
-            <p class="text-pink-200 mt-4 text-sm uppercase tracking-[0.3em]">Carregando sua experiência...</p>
+            <p class="text-pink-200 mt-4 text-sm uppercase tracking-[0.3em] font-bold">Carregando...</p>
         </div>
     </div>
 
@@ -113,7 +114,7 @@
                 QR Code <i data-lucide="heart" class="w-7 h-7 mx-2 fill-neon-pink text-neon-pink animate-pulse"></i> Love
             </div>
             <a href="#criar" class="hidden md:inline-flex bg-white text-wine-900 px-6 py-3 rounded-full text-sm font-bold hover:bg-neon-pink hover:text-white transition-all hover:scale-110 shadow-lg shadow-wine-900/30 items-center group">
-                Criar o Meu
+                Criar Grátis
                 <i data-lucide="zap" class="w-4 h-4 ml-2 group-hover:animate-bounce"></i>
             </a>
         </div>
@@ -133,7 +134,7 @@
                 <span class="inline-block py-2 px-6 rounded-full bg-wine-950/50 border border-neon-pink/50 text-neon-pink text-sm font-extrabold uppercase tracking-[0.2em] mb-8 backdrop-blur-md shadow-lg shadow-neon-pink/20 animate-pulse-intense">
                     A Nova Era dos Presentes
                 </span>
-                <h1 class="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-none drop-shadow-2xl">
+                <h1 class="text-5xl md:text-8xl font-black tracking-tighter mb-8 leading-none drop-shadow-2xl">
                     O Presente Mais <br>
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-pink via-white to-neon-purple" style="-webkit-text-stroke: 1px rgba(255,255,255,0.1);">Apaixonante</span><br>
                     Do Mundo Digital.
@@ -172,37 +173,38 @@
         <div class="max-w-7xl mx-auto px-6 relative z-10">
             <div class="text-center mb-16 reveal">
                 <h2 class="text-4xl md:text-6xl font-black text-white mb-6 drop-shadow-lg">Veja a <span class="text-neon-pink">Mágica</span> Acontecer.</h2>
-                <p class="text-xl text-pink-200 max-w-2xl mx-auto">Você cria no computador ou celular em minutos. O resultado é um app nativo do amor de vocês.</p>
+                <p class="text-xl text-pink-200 max-w-2xl mx-auto">Funciona como um aplicativo nativo. Basta apontar a câmera.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center justify-center">
                 
                 <div class="hidden md:block md:col-span-3 reveal -rotate-6 transform hover:rotate-0 transition-all duration-500">
                     <div class="relative rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white/10">
-                         <img src="https://images.unsplash.com/photo-1523438097201-539004340303?q=80&w=1000&auto=format&fit=crop" class="w-full h-[400px] object-cover opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">
+                         <img src="https://images.unsplash.com/photo-1523438097201-539004340303?q=80&w=600&auto=format&fit=crop" class="w-full h-[400px] object-cover opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">
                          <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-gray-900 p-6">
-                            <p class="text-white font-bold text-lg">Momentos Reais</p>
+                            <p class="text-white font-bold text-lg">Eternize Momentos</p>
                          </div>
                     </div>
                 </div>
 
                 <div class="col-span-1 md:col-span-6 flex justify-center reveal md:scale-110 z-20">
-                    <div class="relative w-[320px] sm:w-[360px] h-[640px] sm:h-[700px] bg-black rounded-[3rem] border-[12px] border-gray-800 shadow-[0_0_60px_-15px_rgba(255,0,127,0.6)] overflow-hidden ring-4 ring-neon-pink/50">
-                        <div class="absolute top-0 inset-x-0 h-8 bg-gray-800 rounded-b-3xl mx-auto w-40 z-30"></div>
+                    <div class="relative w-[300px] sm:w-[350px] aspect-[9/19] bg-black rounded-[3rem] border-[12px] border-gray-800 shadow-[0_0_80px_-15px_rgba(255,0,127,0.5)] overflow-hidden ring-4 ring-neon-pink/50">
+                        <div class="absolute top-0 inset-x-0 h-7 bg-gray-800 rounded-b-2xl mx-auto w-32 z-30"></div>
                         
                         <div class="relative h-full w-full bg-gray-900 group">
                             
                             <video 
                                 class="w-full h-full object-cover" 
                                 autoplay muted loop playsinline
-                                poster="https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?q=80&w=2576&auto=format&fit=crop">
-                                <source src="COLOQUE_SEU_LINK_DO_CLOUDINARY_AQUI.mp4" type="video/mp4">
+                                poster="https://images.unsplash.com/photo-1621600411688-4be93cd68504?q=80&w=1000&auto=format&fit=crop">
+                                <source src="LINK_DO_SEU_VIDEO_CLOUDINARY.mp4" type="video/mp4">
+                                
                                 Seu navegador não suporta vídeos.
                             </video>
 
-                            <div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-transparent transition-all pointer-events-none">
-                                <div class="p-4 bg-white/20 backdrop-blur-md rounded-full border border-white/40 animate-pulse-slow group-hover:opacity-0 transition-opacity">
-                                    <i data-lucide="play" class="w-10 h-10 text-white fill-white"></i>
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/10 pointer-events-none">
+                                <div class="p-4 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 animate-pulse group-hover:hidden">
+                                    <i data-lucide="play" class="w-8 h-8 text-white fill-white"></i>
                                 </div>
                             </div>
                         </div>
@@ -211,9 +213,9 @@
 
                  <div class="hidden md:block md:col-span-3 reveal rotate-6 transform hover:rotate-0 transition-all duration-500">
                     <div class="relative rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white/10 mt-20">
-                         <img src="https://images.unsplash.com/photo-1542042161-702f08eb23d5?q=80&w=1000&auto=format&fit=crop" class="w-full h-[400px] object-cover opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">
+                         <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop" class="w-full h-[400px] object-cover opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">
                           <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-gray-900 p-6">
-                            <p class="text-white font-bold text-lg text-right">Conexão Única</p>
+                            <p class="text-white font-bold text-lg text-right">Amor Real</p>
                          </div>
                     </div>
                 </div>
@@ -247,8 +249,7 @@
                 <div class="reveal delay-200 flex flex-col items-center md:-mt-12 group relative z-10">
                     <div class="absolute inset-0 bg-neon-pink/20 blur-[60px] rounded-full z-0 animate-pulse-slow"></div>
                     <div class="relative w-80 h-[580px] bg-gray-800 rounded-[3rem] border-[10px] border-gray-700 shadow-[0_0_50px_rgba(255,0,127,0.4)] overflow-hidden transform md:scale-105 group-hover:scale-110 transition-transform duration-500 z-10">
-                         <img src="https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover">
-                        
+                        <img src="https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover">
                         <div class="absolute bottom-8 left-0 right-0 text-center">
                             <span class="bg-neon-pink/80 backdrop-blur-md px-6 py-2 rounded-full text-sm font-black text-white shadow-lg">TEMA ELEGANT (Premium)</span>
                         </div>
@@ -257,7 +258,7 @@
 
                 <div class="reveal delay-300 flex flex-col items-center group">
                     <div class="relative w-72 h-[500px] bg-gray-800 rounded-[2.5rem] border-8 border-gray-700 shadow-2xl overflow-hidden group-hover:-translate-y-4 transition-transform duration-500 ring-4 ring-transparent group-hover:ring-neon-purple/30">
-                         <img src="https://images.unsplash.com/photo-1529636721198-4c3780053cc2?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1529636721198-4c3780053cc2?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover">
                          <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-6">
                             <span class="font-bold">Tema Clássico</span>
                         </div>
@@ -386,18 +387,12 @@
                 Transformando histórias reais em experiências digitais inesquecíveis. O presente perfeito para a era phygital.
             </p>
             
-            <div class="flex justify-center space-x-6 mb-8">
-                <a href="#" class="text-gray-400 hover:text-neon-pink transition-colors"><i data-lucide="instagram" class="w-6 h-6"></i></a>
-                <a href="#" class="text-gray-400 hover:text-neon-pink transition-colors"><i data-lucide="facebook" class="w-6 h-6"></i></a>
-                <a href="#" class="text-gray-400 hover:text-neon-pink transition-colors"><i data-lucide="twitter" class="w-6 h-6"></i></a>
-            </div>
-
             <div class="text-sm text-gray-500 border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-center items-center">
                 <a href="https://www.qrcodebrindes.com.br" target="_blank" class="hover:text-neon-pink transition-colors font-bold mb-2 md:mb-0">
                     Desenvolvido com paixão por QRCODEBRINDES.com.br
                 </a>
                 <span class="hidden md:inline mx-4 text-gray-700">•</span>
-                <span>© {{ current_year }} Todos os direitos reservados.</span>
+                <span>© 2026 Todos os direitos reservados.</span>
             </div>
         </div>
     </footer>
@@ -406,17 +401,29 @@
         // Inicializa Ícones
         lucide.createIcons();
 
-        // --- SCRIPT DO PRELOADER (Tela de Carregamento) ---
-        window.addEventListener('load', () => {
-            // Espera 2.5 segundos para garantir que o usuário veja a animação do logo
-            setTimeout(() => {
-                const preloader = document.getElementById('preloader');
+        // ===============================================
+        // SOLUÇÃO DO LOADING DEMORADO (MAX 2 SEGUNDOS)
+        // ===============================================
+        
+        const preloader = document.getElementById('preloader');
+        
+        function removePreloader() {
+            if (preloader && !preloader.classList.contains('loaded')) {
                 preloader.classList.add('loaded');
-                // Permite o scroll novamente após o carregamento
-                document.body.style.overflowY = 'auto';
-            }, 2500); 
+                document.body.style.overflowY = 'auto'; // Libera o scroll
+            }
+        }
+
+        // Tenta remover assim que o HTML carregar (antes do video)
+        document.addEventListener("DOMContentLoaded", function() {
+            // Pequeno delay de 1.5s só pro usuário ver o logo bonito
+            setTimeout(removePreloader, 1500);
         });
-        // Bloqueia scroll enquanto carrega
+
+        // FALLBACK DE SEGURANÇA: Se em 2.5s não carregou, remove na marra.
+        setTimeout(removePreloader, 2500);
+        
+        // Bloqueia scroll inicialmente
         document.body.style.overflowY = 'hidden';
 
 
@@ -434,35 +441,33 @@
             }
         });
 
-        // --- SCRIPT PARA LIMPEZA AUTOMÁTICA DO SLUG (UX Importante) ---
+        // --- SCRIPT PARA LIMPEZA AUTOMÁTICA DO SLUG ---
         const slugInput = document.getElementById('slugInput');
         if (slugInput) {
             slugInput.addEventListener('keyup', function(e) {
                 let val = this.value.toString().toLowerCase()
-                    .normalize('NFD').replace(/[\u0300-\u036f]/g, "") // Remove acentos
-                    .replace(/\s+/g, '-')           // Espaço vira traço
-                    .replace(/[^\w\-]+/g, '')       // Remove caracteres não alfanuméricos
-                    .replace(/\-\-+/g, '-')         // Remove múltiplos traços
-                    .replace(/^-+/, '')             // Remove traço do início
-                    .replace(/-+$/, '');            // Remove traço do fim
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, "") 
+                    .replace(/\s+/g, '-')           
+                    .replace(/[^\w\-]+/g, '')       
+                    .replace(/\-\-+/g, '-')         
+                    .replace(/^-+/, '')             
+                    .replace(/-+$/, '');            
                 
                 this.value = val;
             });
         }
 
-        // --- SCRIPT DE ANIMAÇÃO AO SCROLL (Intersection Observer) ---
+        // --- SCRIPT DE ANIMAÇÃO AO SCROLL ---
         const observerOptions = {
             root: null,
             rootMargin: '0px',
-            threshold: 0.15 // Dispara quando 15% do elemento está visível
+            threshold: 0.15 
         };
 
         const observer = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('active');
-                    // Opcional: parar de observar após revelar para melhorar performance
-                    // observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);

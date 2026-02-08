@@ -1,33 +1,45 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="scroll-smooth">
+<html lang="pt-br" class="scroll-smooth overflow-x-hidden text-gray-900">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crie sua Página Phygital | QR Code Love</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    fontFamily: { sans: ['Montserrat', 'sans-serif'] },
                     colors: {
-                        brand: {
-                            pink: '#FF6B8B',
-                            dark: '#111827',
-                            light: '#F9FAFB'
+                        wine: {
+                            800: '#9D174D', // Vinho vibrante
+                            900: '#831843', // Vinho profundo
+                            950: '#500724'  // Vinho escuro (loading)
+                        },
+                        neon: {
+                            pink: '#FF007F',
+                            purple: '#9D00FF'
                         }
                     },
                     animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float-slow': 'float 8s ease-in-out infinite',
+                        'float-medium': 'float 5s ease-in-out infinite reverse',
+                        'float-fast': 'float 3s ease-in-out infinite',
+                        'pulse-intense': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                        'fade-out-up': 'fadeOutUp 1s forwards ease-in-out',
                     },
                     keyframes: {
                         float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-20px)' },
+                            '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-25px) rotate(5deg)' },
+                        },
+                        fadeOutUp: {
+                            '0%': { opacity: 1, transform: 'translateY(0)' },
+                            '100%': { opacity: 0, transform: 'translateY(-100%)', visibility: 'hidden' },
                         }
                     }
                 }
@@ -38,222 +50,324 @@
         /* Utilitários de Animação ao Scroll */
         .reveal {
             opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+            transform: translateY(40px) scale(0.95);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .reveal.active {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
         }
         
-        /* Glassmorphism */
-        .glass {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        /* Glassmorphism mais forte */
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        /* Fundo animado */
+        .animated-bg {
+             background: linear-gradient(-45deg, #500724, #831843, #3b0764, #be185d);
+	         background-size: 400% 400%;
+	         animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG {
+	        0% { background-position: 0% 50%; }
+	        50% { background-position: 100% 50%; }
+	        100% { background-position: 0% 50%; }
+        }
+
+        /* Preloader Styles */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background-color: #500724; /* Vinho escuro */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #preloader.loaded {
+            animation: fadeOutUp 1.2s forwards ease-in-out;
+            pointer-events: none;
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 overflow-x-hidden antialiased">
+<body class="bg-gray-50 antialiased overflow-x-hidden">
 
-    <nav class="fixed w-full z-50 transition-all duration-300 glass border-b border-gray-100/50">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center text-brand-pink font-bold text-xl tracking-tight">
-                QR Code <i data-lucide="heart" class="w-6 h-6 mx-2 fill-current animate-pulse"></i> Love
+    <div id="preloader">
+        <div class="text-center animate-pulse-intense">
+            <div class="flex items-center justify-center text-white font-black text-4md md:text-5xl tracking-tighter">
+                QR Code <i data-lucide="heart" class="w-10 h-10 mx-3 fill-neon-pink text-neon-pink"></i> Love
             </div>
-            <a href="#criar" class="bg-brand-dark text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-all hover:scale-105 shadow-lg">
-                Começar Agora
+            <p class="text-pink-200 mt-4 text-sm uppercase tracking-[0.3em]">Carregando sua experiência...</p>
+        </div>
+    </div>
+
+
+    <nav class="fixed w-full z-40 transition-all duration-500 py-4" id="mainNav">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center text-white font-bold text-2xl tracking-tight drop-shadow-lg">
+                QR Code <i data-lucide="heart" class="w-7 h-7 mx-2 fill-neon-pink text-neon-pink animate-pulse"></i> Love
+            </div>
+            <a href="#criar" class="hidden md:inline-flex bg-white text-wine-900 px-6 py-3 rounded-full text-sm font-bold hover:bg-neon-pink hover:text-white transition-all hover:scale-110 shadow-lg shadow-wine-900/30 items-center group">
+                Criar o Meu
+                <i data-lucide="zap" class="w-4 h-4 ml-2 group-hover:animate-bounce"></i>
             </a>
         </div>
     </nav>
 
-    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-tr from-pink-200 to-purple-200 rounded-full blur-3xl opacity-30 -z-10 animate-pulse-slow"></div>
+    <header class="relative min-h-[90vh] flex items-center justify-center overflow-hidden animated-bg text-white pb-20 pt-32">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-20 left-10 w-32 h-32 bg-neon-pink rounded-full mix-blend-screen filter blur-[80px] opacity-60 animate-float-slow"></div>
+            <div class="absolute bottom-40 right-20 w-48 h-48 bg-neon-purple rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-float-medium"></div>
+            <i data-lucide="heart" class="absolute top-1/4 left-1/3 text-pink-500/30 w-16 h-16 animate-float-fast fill-current"></i>
+            <i data-lucide="heart" class="absolute bottom-1/3 right-1/4 text-purple-500/30 w-24 h-24 animate-float-slow fill-current" style="animation-delay: 1s"></i>
+             <i data-lucide="sparkles" class="absolute top-40 right-40 text-yellow-300/50 w-12 h-12 animate-spin-slow"></i>
+        </div>
 
-        <div class="max-w-4xl mx-auto px-6 text-center">
-            <div class="reveal">
-                <span class="inline-block py-1 px-3 rounded-full bg-pink-100 text-pink-600 text-xs font-bold uppercase tracking-widest mb-6">
-                    Novo Phygital Love
+        <div class="max-w-5xl mx-auto px-6 text-center relative z-10">
+            <div class="reveal active">
+                <span class="inline-block py-2 px-6 rounded-full bg-wine-950/50 border border-neon-pink/50 text-neon-pink text-sm font-extrabold uppercase tracking-[0.2em] mb-8 backdrop-blur-md shadow-lg shadow-neon-pink/20 animate-pulse-intense">
+                    A Nova Era dos Presentes
                 </span>
-                <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 mb-6 leading-tight">
-                    Eternize seu amor <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-600">no mundo digital.</span>
+                <h1 class="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-none drop-shadow-2xl">
+                    O Presente Mais <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-pink via-white to-neon-purple" style="-webkit-text-stroke: 1px rgba(255,255,255,0.1);">Apaixonante</span><br>
+                    Do Mundo Digital.
                 </h1>
-                <p class="text-lg md:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-                    Mais que um site. Uma experiência imersiva com <strong>sua trilha sonora do Spotify</strong>, timeline da sua história e galeria de fotos. Tudo conectado a um QR Code.
+                <p class="text-xl md:text-2xl text-pink-100 mb-12 max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-md">
+                    Crie uma página exclusiva com a <strong>trilha sonora de vocês (Spotify)</strong>, fotos e timeline. Tudo acessível por um QR Code elegante.
                 </p>
                 
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="#criar" class="w-full sm:w-auto px-8 py-4 bg-pink-600 text-white rounded-full font-bold text-lg shadow-xl shadow-pink-500/30 hover:bg-pink-700 hover:scale-105 transition-all">
-                        Criar Minha Página Grátis
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+                    <a href="#criar" class="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-neon-pink to-wine-800 rounded-full font-black text-xl shadow-2xl shadow-neon-pink/40 hover:scale-110 hover:-translate-y-2 transition-all relative overflow-hidden group">
+                        <span class="relative z-10 flex items-center justify-center">
+                            QUERO CRIAR AGORA <i data-lucide="arrow-right" class="ml-2 group-hover:translate-x-2 transition-transform"></i>
+                        </span>
+                         <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                     </a>
-                    <a href="#como-funciona" class="w-full sm:w-auto px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-full font-medium hover:bg-gray-50 transition-all flex items-center justify-center">
-                        <i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Ver Vídeo
+                    <a href="#video-showcase" class="w-full sm:w-auto px-10 py-5 glass-strong text-white rounded-full font-bold text-lg hover:bg-white/20 transition-all flex items-center justify-center hover:scale-105">
+                        <i data-lucide="play-circle" class="w-6 h-6 mr-3 fill-white/20"></i> Ver na Prática
                     </a>
                 </div>
             </div>
+             <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+                <i data-lucide="chevrons-down" class="w-10 h-10 text-white/50"></i>
+            </div>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 leading-none">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="w-full h-auto text-gray-900 fill-current"><path d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,250.7C960,235,1056,181,1152,165.3C1248,149,1344,171,1392,181.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>
         </div>
     </header>
 
-    <section id="como-funciona" class="py-10 px-4">
-        <div class="max-w-5xl mx-auto reveal">
-            <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white aspect-video bg-black group">
-                <video 
-                    class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" 
-                    autoplay muted loop playsinline
-                    poster="https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?q=80&w=2576&auto=format&fit=crop">
-                    <source src="SEU_LINK_DO_VIDEO_CLOUDINARY_AQUI.mp4" type="video/mp4">
-                    Seu navegador não suporta vídeos.
-                </video>
+    <section id="video-showcase" class="py-24 bg-gray-900 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20 pointer-events-none">
+            <div class="absolute top-1/2 left-1/4 w-96 h-96 bg-wine-800 rounded-full mix-blend-lighten filter blur-[120px] animate-float-slow"></div>
+            <div class="absolute top-1/3 right-1/4 w-80 h-80 bg-neon-pink rounded-full mix-blend-lighten filter blur-[100px] animate-float-medium"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-4xl md:text-6xl font-black text-white mb-6 drop-shadow-lg">Veja a <span class="text-neon-pink">Mágica</span> Acontecer.</h2>
+                <p class="text-xl text-pink-200 max-w-2xl mx-auto">Você cria no computador ou celular em minutos. O resultado é um app nativo do amor de vocês.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center justify-center">
                 
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-full border border-white/20">
-                        <i data-lucide="play" class="w-8 h-8 text-white fill-white"></i>
+                <div class="hidden md:block md:col-span-3 reveal -rotate-6 transform hover:rotate-0 transition-all duration-500">
+                    <div class="relative rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white/10">
+                         <img src="https://images.unsplash.com/photo-1523438097201-539004340303?q=80&w=1000&auto=format&fit=crop" class="w-full h-[400px] object-cover opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">
+                         <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-gray-900 p-6">
+                            <p class="text-white font-bold text-lg">Momentos Reais</p>
+                         </div>
+                    </div>
+                </div>
+
+                <div class="col-span-1 md:col-span-6 flex justify-center reveal md:scale-110 z-20">
+                    <div class="relative w-[320px] sm:w-[360px] h-[640px] sm:h-[700px] bg-black rounded-[3rem] border-[12px] border-gray-800 shadow-[0_0_60px_-15px_rgba(255,0,127,0.6)] overflow-hidden ring-4 ring-neon-pink/50">
+                        <div class="absolute top-0 inset-x-0 h-8 bg-gray-800 rounded-b-3xl mx-auto w-40 z-30"></div>
+                        
+                        <div class="relative h-full w-full bg-gray-900 group">
+                            
+                            <video 
+                                class="w-full h-full object-cover" 
+                                autoplay muted loop playsinline
+                                poster="https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?q=80&w=2576&auto=format&fit=crop">
+                                <source src="COLOQUE_SEU_LINK_DO_CLOUDINARY_AQUI.mp4" type="video/mp4">
+                                Seu navegador não suporta vídeos.
+                            </video>
+
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-transparent transition-all pointer-events-none">
+                                <div class="p-4 bg-white/20 backdrop-blur-md rounded-full border border-white/40 animate-pulse-slow group-hover:opacity-0 transition-opacity">
+                                    <i data-lucide="play" class="w-10 h-10 text-white fill-white"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <div class="hidden md:block md:col-span-3 reveal rotate-6 transform hover:rotate-0 transition-all duration-500">
+                    <div class="relative rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white/10 mt-20">
+                         <img src="https://images.unsplash.com/photo-1542042161-702f08eb23d5?q=80&w=1000&auto=format&fit=crop" class="w-full h-[400px] object-cover opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">
+                          <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-gray-900 p-6">
+                            <p class="text-white font-bold text-lg text-right">Conexão Única</p>
+                         </div>
                     </div>
                 </div>
             </div>
-            <p class="text-center text-sm text-gray-400 mt-4">Assista como é fácil criar e personalizar.</p>
         </div>
     </section>
 
-    <section class="py-24 bg-gray-900 text-white overflow-hidden">
-        <div class="max-w-6xl mx-auto px-6">
+    <section class="py-24 bg-gradient-to-b from-gray-900 to-wine-950 text-white overflow-hidden relative">
+        <div class="absolute top-0 left-0 right-0 leading-none rotate-180">
+             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="w-full h-auto text-gray-900 fill-current"><path d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,250.7C960,235,1056,181,1152,165.3C1248,149,1344,171,1392,181.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-6 relative z-10 pt-32">
             
-            <div class="text-center mb-16 reveal">
-                <h2 class="text-3xl md:text-5xl font-bold mb-4">Poderoso. Emocionante. Único.</h2>
-                <p class="text-gray-400 max-w-xl mx-auto">Design digno de app, sem precisar instalar nada. Funciona direto no navegador.</p>
+            <div class="text-center mb-20 reveal">
+                <h2 class="text-4xl md:text-5xl font-black mb-6">Dois Estilos. <span class="text-neon-pink">Uma Paixão.</span></h2>
+                <p class="text-pink-200 text-xl max-w-xl mx-auto">Escolha o template que mais combina com a história de vocês.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-center">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-16 items-center justify-items-center">
                 
-                <div class="reveal delay-100 flex flex-col items-center">
-                    <div class="relative w-64 h-[500px] bg-gray-800 rounded-[2.5rem] border-8 border-gray-700 shadow-2xl overflow-hidden animate-float">
+                <div class="reveal delay-100 flex flex-col items-center group">
+                    <div class="relative w-72 h-[500px] bg-gray-800 rounded-[2.5rem] border-8 border-gray-700 shadow-2xl overflow-hidden group-hover:-translate-y-4 transition-transform duration-500 ring-4 ring-transparent group-hover:ring-neon-pink/30">
                         <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-6">
+                            <span class="font-bold">Painel de Controle</span>
+                        </div>
                     </div>
-                    <h3 class="mt-6 text-xl font-bold">Painel Intuitivo</h3>
-                    <p class="text-gray-400 text-center text-sm mt-2">Arraste fotos, escolha músicas e mude cores em tempo real.</p>
                 </div>
 
-                <div class="reveal delay-200 flex flex-col items-center mt-12 md:mt-0">
-                    <div class="relative w-72 h-[550px] bg-gray-800 rounded-[2.5rem] border-8 border-gray-700 shadow-2xl shadow-pink-500/20 overflow-hidden transform md:-translate-y-12">
+                <div class="reveal delay-200 flex flex-col items-center md:-mt-12 group relative z-10">
+                    <div class="absolute inset-0 bg-neon-pink/20 blur-[60px] rounded-full z-0 animate-pulse-slow"></div>
+                    <div class="relative w-80 h-[580px] bg-gray-800 rounded-[3rem] border-[10px] border-gray-700 shadow-[0_0_50px_rgba(255,0,127,0.4)] overflow-hidden transform md:scale-105 group-hover:scale-110 transition-transform duration-500 z-10">
                          <img src="https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover">
                         
-                        <div class="absolute bottom-6 left-0 right-0 text-center">
-                            <span class="bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-xs font-bold">Tema Elegante</span>
+                        <div class="absolute bottom-8 left-0 right-0 text-center">
+                            <span class="bg-neon-pink/80 backdrop-blur-md px-6 py-2 rounded-full text-sm font-black text-white shadow-lg">TEMA ELEGANT (Premium)</span>
                         </div>
                     </div>
-                    <h3 class="mt-6 text-xl font-bold text-pink-400">Design Premium</h3>
-                    <p class="text-gray-400 text-center text-sm mt-2">Layouts pensados para emocionar quem recebe.</p>
                 </div>
 
-                <div class="reveal delay-300 flex flex-col items-center">
-                    <div class="relative w-64 h-[500px] bg-gray-800 rounded-[2.5rem] border-8 border-gray-700 shadow-2xl overflow-hidden animate-float" style="animation-delay: 1s;">
+                <div class="reveal delay-300 flex flex-col items-center group">
+                    <div class="relative w-72 h-[500px] bg-gray-800 rounded-[2.5rem] border-8 border-gray-700 shadow-2xl overflow-hidden group-hover:-translate-y-4 transition-transform duration-500 ring-4 ring-transparent group-hover:ring-neon-purple/30">
                          <img src="https://images.unsplash.com/photo-1529636721198-4c3780053cc2?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover">
+                         <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-6">
+                            <span class="font-bold">Tema Clássico</span>
+                        </div>
                     </div>
-                    <h3 class="mt-6 text-xl font-bold">100% Personalizável</h3>
-                    <p class="text-gray-400 text-center text-sm mt-2">Integração nativa com Spotify e Galeria Inteligente.</p>
                 </div>
 
             </div>
         </div>
     </section>
 
-    <section id="criar" class="py-24 relative bg-gray-50">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+    <section id="criar" class="py-32 relative bg-wine-950 overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-wine-950 to-transparent z-10"></div>
+        <div class="absolute -top-20 -left-20 w-96 h-96 bg-neon-pink rounded-full mix-blend-screen filter blur-[150px] opacity-30 animate-pulse-slow"></div>
+        <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-wine-800 rounded-full mix-blend-screen filter blur-[150px] opacity-30 animate-float-slow"></div>
 
-        <div class="max-w-4xl mx-auto px-4 relative z-10">
+        <div class="max-w-5xl mx-auto px-4 relative z-20">
             
-            <div class="text-center mb-10 reveal">
-                <h2 class="text-3xl font-bold text-gray-900">Comece Agora. É Grátis.</h2>
-                <p class="text-gray-500 mt-2">Preencha os dados abaixo para gerar seu painel administrativo.</p>
+            <div class="text-center mb-16 reveal">
+                <span class="text-neon-pink font-bold uppercase tracking-widest mb-2 block">Último Passo</span>
+                <h2 class="text-4xl md:text-5xl font-black text-white drop-shadow-lg mb-4">Crie Sua Página Agora.</h2>
+                <p class="text-pink-200 text-lg">É gratuito, rápido e você não precisa saber programar.</p>
             </div>
 
-            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 reveal">
-                <div class="grid grid-cols-1 md:grid-cols-5">
+            <div class="glass-strong rounded-[3rem] shadow-2xl overflow-hidden reveal transform hover:scale-[1.01] transition-transform duration-500">
+                <div class="grid grid-cols-1 lg:grid-cols-5">
                     
-                    <div class="bg-gray-900 p-10 text-white md:col-span-2 flex flex-col justify-between relative overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-pink-600 to-purple-700 opacity-90"></div>
+                    <div class="bg-gradient-to-br from-gray-900 via-wine-900 to-gray-900 p-12 text-white lg:col-span-2 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-neon-pink blur-[100px] opacity-40 rounded-full pointer-events-none animate-pulse-slow"></div>
+                        
                         <div class="relative z-10">
-                            <h3 class="text-xl font-bold mb-6">O que está incluso?</h3>
-                            <ul class="space-y-4 text-sm">
-                                <li class="flex items-center"><i data-lucide="check-circle" class="w-5 h-5 mr-3 text-pink-300"></i> Hospedagem Grátis</li>
-                                <li class="flex items-center"><i data-lucide="music" class="w-5 h-5 mr-3 text-pink-300"></i> Integração Spotify</li>
-                                <li class="flex items-center"><i data-lucide="image" class="w-5 h-5 mr-3 text-pink-300"></i> Galeria de Fotos</li>
-                                <li class="flex items-center"><i data-lucide="shield-check" class="w-5 h-5 mr-3 text-pink-300"></i> Painel com Senha</li>
+                            <h3 class="text-2xl font-black mb-8 text-transparent bg-clip-text bg-gradient-to-r from-white to-pink-300">Incluso no Plano Grátis:</h3>
+                            <ul class="space-y-6 font-medium">
+                                <li class="flex items-center"><div class="bg-neon-pink/20 p-2 rounded-full mr-4"><i data-lucide="check" class="w-6 h-6 text-neon-pink"></i></div> Hospedagem Vitalícia</li>
+                                <li class="flex items-center"><div class="bg-neon-pink/20 p-2 rounded-full mr-4"><i data-lucide="music" class="w-6 h-6 text-neon-pink"></i></div> Integração Spotify Oficial</li>
+                                <li class="flex items-center"><div class="bg-neon-pink/20 p-2 rounded-full mr-4"><i data-lucide="smartphone" class="w-6 h-6 text-neon-pink"></i></div> 100% Responsivo (Celular)</li>
+                                <li class="flex items-center"><div class="bg-neon-pink/20 p-2 rounded-full mr-4"><i data-lucide="lock" class="w-6 h-6 text-neon-pink"></i></div> Proteção por Senha</li>
                             </ul>
                         </div>
-                        <div class="relative z-10 mt-10">
-                            <div class="flex -space-x-2">
-                                <img class="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/100?img=1" alt="">
-                                <img class="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/100?img=5" alt="">
-                                <img class="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/100?img=8" alt="">
-                                <div class="w-8 h-8 rounded-full border-2 border-white bg-gray-800 text-[10px] flex items-center justify-center">+2k</div>
+                        <div class="relative z-10 mt-16">
+                             <p class="text-pink-200 font-bold mb-4">Junte-se à comunidade:</p>
+                            <div class="flex -space-x-4">
+                                <img class="w-12 h-12 rounded-full border-4 border-wine-900" src="https://i.pravatar.cc/100?img=10" alt="">
+                                <img class="w-12 h-12 rounded-full border-4 border-wine-900" src="https://i.pravatar.cc/100?img=25" alt="">
+                                <img class="w-12 h-12 rounded-full border-4 border-wine-900" src="https://i.pravatar.cc/100?img=32" alt="">
+                                <div class="w-12 h-12 rounded-full border-4 border-wine-900 bg-gradient-to-r from-neon-pink to-wine-600 text-white font-bold flex items-center justify-center text-sm">+2k</div>
                             </div>
-                            <p class="text-xs text-pink-100 mt-2">Junte-se a mais de 2.000 casais.</p>
                         </div>
                     </div>
 
-                    <div class="p-10 md:col-span-3">
+                    <div class="p-10 md:p-14 lg:col-span-3 bg-white">
                         
                         {% if error %}
-                        <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 text-red-700 text-sm rounded flex items-center animate-pulse">
-                            <i data-lucide="alert-triangle" class="w-5 h-5 mr-2"></i> {{ error }}
+                        <div class="mb-8 bg-red-100 border-l-8 border-red-600 p-4 text-red-800 font-bold rounded-r-xl flex items-center animate-bounce-subtle shadow-md">
+                            <i data-lucide="alert-octagon" class="w-6 h-6 mr-3 flex-shrink-0"></i> {{ error }}
                         </div>
                         {% endif %}
 
-                        <form method="POST" class="space-y-5">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Seu Nome</label>
+                        <form method="POST" class="space-y-6">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="group">
+                                    <label class="block text-sm font-extrabold text-wine-900 uppercase tracking-wider mb-2 ml-1 group-hover:text-neon-pink transition-colors">Seu Nome</label>
                                     <input type="text" name="nome" required placeholder="Ex: Lucas"
-                                           class="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all outline-none">
+                                           class="block w-full px-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-bold text-gray-800 placeholder-gray-400">
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Sobrenome</label>
+                                <div class="group">
+                                    <label class="block text-sm font-extrabold text-wine-900 uppercase tracking-wider mb-2 ml-1 group-hover:text-neon-pink transition-colors">Sobrenome</label>
                                     <input type="text" name="sobrenome" required placeholder="Ex: Silva"
-                                           class="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all outline-none">
+                                           class="block w-full px-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-bold text-gray-800 placeholder-gray-400">
                                 </div>
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">WhatsApp</label>
+                            <div class="group">
+                                <label class="block text-sm font-extrabold text-wine-900 uppercase tracking-wider mb-2 ml-1 group-hover:text-neon-pink transition-colors">WhatsApp</label>
                                 <div class="relative">
-                                    <i data-lucide="phone" class="absolute left-3 top-3.5 w-4 h-4 text-gray-400"></i>
+                                    <i data-lucide="phone" class="absolute left-5 top-4.5 w-5 h-5 text-gray-400 group-focus-within:text-neon-pink transition-colors"></i>
                                     <input type="text" name="whatsapp" required placeholder="(11) 99999-9999"
-                                           class="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all outline-none">
+                                           class="block w-full pl-14 pr-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-bold text-gray-800 placeholder-gray-400">
                                 </div>
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Link Personalizado (Slug)</label>
-                                <div class="flex rounded-xl shadow-sm">
-                                    <span class="inline-flex items-center px-4 rounded-l-xl border border-r-0 border-gray-200 bg-gray-100 text-gray-500 text-xs font-mono">
-                                        leanttro.com/
+                            <div class="group">
+                                <label class="block text-sm font-extrabold text-wine-900 uppercase tracking-wider mb-2 ml-1 group-hover:text-neon-pink transition-colors">Link Personalizado (Slug)</label>
+                                <div class="flex rounded-2xl shadow-sm ring-2 ring-transparent group-focus-within:ring-neon-pink/30 transition-all">
+                                    <span class="inline-flex items-center px-6 rounded-l-2xl border-2 border-r-0 border-gray-200 bg-gray-100 text-wine-900 font-bold text-sm tracking-tight">
+                                        qrcode.love/
                                     </span>
                                     <input type="text" name="slug" id="slugInput" required placeholder="maria-e-joao"
-                                           class="block flex-1 min-w-0 px-4 py-3 border border-gray-200 rounded-r-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none bg-white font-bold text-gray-700">
+                                           class="block flex-1 min-w-0 px-5 py-4 border-2 border-gray-200 rounded-r-2xl focus:ring-0 focus:border-neon-pink outline-none bg-white font-black text-xl text-neon-pink placeholder-gray-300 lowercase">
                                 </div>
-                                <p class="text-[11px] text-gray-400 mt-1 ml-1">Dica: Use nomes curtos sem acentos. O sistema ajusta automático.</p>
+                                <p class="text-xs text-gray-500 mt-2 ml-2 flex items-center">
+                                    <i data-lucide="info" class="w-3 h-3 mr-1"></i> O link será ajustado automaticamente enquanto você digita.
+                                </p>
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Crie uma Senha</label>
+                            <div class="group">
+                                <label class="block text-sm font-extrabold text-wine-900 uppercase tracking-wider mb-2 ml-1 group-hover:text-neon-pink transition-colors">Crie uma Senha de Acesso</label>
                                 <div class="relative">
-                                    <i data-lucide="lock" class="absolute left-3 top-3.5 w-4 h-4 text-gray-400"></i>
-                                    <input type="password" name="admin_password" required placeholder="Mínimo 6 caracteres"
-                                           class="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all outline-none">
+                                    <i data-lucide="lock" class="absolute left-5 top-4.5 w-5 h-5 text-gray-400 group-focus-within:text-neon-pink transition-colors"></i>
+                                    <input type="password" name="admin_password" required placeholder="••••••••"
+                                           class="block w-full pl-14 pr-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-bold text-gray-800 placeholder-gray-400">
                                 </div>
                             </div>
 
-                            <button type="submit" class="w-full flex items-center justify-center py-4 px-6 border border-transparent rounded-xl shadow-lg text-base font-bold text-white bg-pink-600 hover:bg-pink-700 transition-all transform hover:scale-[1.02] active:scale-95 group">
-                                <span>Criar Página Agora</span>
-                                <i data-lucide="arrow-right" class="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                            <button type="submit" class="w-full flex items-center justify-center py-5 px-8 border-2 border-transparent rounded-2xl shadow-2xl text-lg font-black text-white bg-gradient-to-r from-neon-pink to-wine-600 hover:from-neon-pink hover:to-neon-pink transition-all transform hover:scale-[1.03] active:scale-95 group relative overflow-hidden">
+                                <span class="relative z-10 flex items-center">GERAR MINHA PÁGINA <i data-lucide="rocket" class="ml-3 w-6 h-6 group-hover:animate-bounce"></i></span>
+                                <div class="absolute inset-0 h-full w-full bg-white/30 skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
                             </button>
                             
-                            <p class="text-center text-xs text-gray-400 mt-4">
-                                Ao criar, você concorda com nossos termos de uso.
+                            <p class="text-center text-xs text-gray-400 mt-6">
+                                Protegido por reCAPTCHA e sujeito aos Termos de Uso e Política de Privacidade.
                             </p>
                         </form>
                     </div>
@@ -262,20 +376,28 @@
         </div>
     </section>
 
-    <footer class="bg-white border-t border-gray-100 py-12 mt-12">
-        <div class="max-w-6xl mx-auto px-6 text-center">
-            <div class="flex justify-center items-center text-pink-600 font-bold text-xl mb-4">
-                QR Code <i data-lucide="heart" class="w-5 h-5 mx-2 fill-current"></i> Love
+    <footer class="bg-gray-900 border-t border-gray-800 py-16 relative overflow-hidden">
+         <div class="absolute inset-0 bg-wine-900/20 mix-blend-overlay pointer-events-none"></div>
+        <div class="max-w-6xl mx-auto px-6 text-center relative z-10">
+            <div class="flex justify-center items-center text-white font-black text-3xl mb-6 tracking-tighter">
+                QR Code <i data-lucide="heart" class="w-8 h-8 mx-2 fill-neon-pink text-neon-pink animate-pulse"></i> Love
             </div>
-            <p class="text-gray-400 text-sm mb-6">
-                A plataforma número #1 para presentes digitais românticos.
+            <p class="text-gray-400 text-base mb-8 max-w-md mx-auto leading-relaxed">
+                Transformando histórias reais em experiências digitais inesquecíveis. O presente perfeito para a era phygital.
             </p>
-            <div class="text-xs text-gray-300">
-                <a href="https://www.qrcodebrindes.com.br" target="_blank" class="hover:text-pink-600 transition-colors font-medium">
-                    Desenvolvido por QRCODEBRINDES.com.br
+            
+            <div class="flex justify-center space-x-6 mb-8">
+                <a href="#" class="text-gray-400 hover:text-neon-pink transition-colors"><i data-lucide="instagram" class="w-6 h-6"></i></a>
+                <a href="#" class="text-gray-400 hover:text-neon-pink transition-colors"><i data-lucide="facebook" class="w-6 h-6"></i></a>
+                <a href="#" class="text-gray-400 hover:text-neon-pink transition-colors"><i data-lucide="twitter" class="w-6 h-6"></i></a>
+            </div>
+
+            <div class="text-sm text-gray-500 border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-center items-center">
+                <a href="https://www.qrcodebrindes.com.br" target="_blank" class="hover:text-neon-pink transition-colors font-bold mb-2 md:mb-0">
+                    Desenvolvido com paixão por QRCODEBRINDES.com.br
                 </a>
-                <span class="mx-2">•</span>
-                <span>{{ current_year }}</span>
+                <span class="hidden md:inline mx-4 text-gray-700">•</span>
+                <span>© {{ current_year }} Todos os direitos reservados.</span>
             </div>
         </div>
     </footer>
@@ -284,11 +406,38 @@
         // Inicializa Ícones
         lucide.createIcons();
 
-        // 1. Script para Limpeza Automática do SLUG (UX Importante)
+        // --- SCRIPT DO PRELOADER (Tela de Carregamento) ---
+        window.addEventListener('load', () => {
+            // Espera 2.5 segundos para garantir que o usuário veja a animação do logo
+            setTimeout(() => {
+                const preloader = document.getElementById('preloader');
+                preloader.classList.add('loaded');
+                // Permite o scroll novamente após o carregamento
+                document.body.style.overflowY = 'auto';
+            }, 2500); 
+        });
+        // Bloqueia scroll enquanto carrega
+        document.body.style.overflowY = 'hidden';
+
+
+        // --- SCRIPT DE NAVBAR DINÂMICA ---
+        const nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.classList.add('glass-strong', 'shadow-lg', 'bg-wine-900/80');
+                nav.classList.remove('py-4');
+                nav.classList.add('py-2');
+            } else {
+                nav.classList.remove('glass-strong', 'shadow-lg', 'bg-wine-900/80');
+                 nav.classList.remove('py-2');
+                nav.classList.add('py-4');
+            }
+        });
+
+        // --- SCRIPT PARA LIMPEZA AUTOMÁTICA DO SLUG (UX Importante) ---
         const slugInput = document.getElementById('slugInput');
         if (slugInput) {
             slugInput.addEventListener('keyup', function(e) {
-                // Remove acentos, espaços e caracteres especiais em tempo real
                 let val = this.value.toString().toLowerCase()
                     .normalize('NFD').replace(/[\u0300-\u036f]/g, "") // Remove acentos
                     .replace(/\s+/g, '-')           // Espaço vira traço
@@ -301,17 +450,19 @@
             });
         }
 
-        // 2. Script de Animação ao Scroll (Intersection Observer)
+        // --- SCRIPT DE ANIMAÇÃO AO SCROLL (Intersection Observer) ---
         const observerOptions = {
             root: null,
             rootMargin: '0px',
-            threshold: 0.1
+            threshold: 0.15 // Dispara quando 15% do elemento está visível
         };
 
         const observer = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('active');
+                    // Opcional: parar de observar após revelar para melhorar performance
+                    // observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);

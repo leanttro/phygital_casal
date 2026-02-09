@@ -237,12 +237,13 @@
         lucide.createIcons();
 
         var swiper = new Swiper(".mySwiper", {
+            // Configurações Padrão (Mobile e Geral)
             effect: "coverflow",
             grabCursor: true,
             centeredSlides: true,
             slidesPerView: "auto",
             loop: true,
-            loopedSlides: 4,
+            loopedSlides: 4, // Mantém o comportamento atual no mobile
             coverflowEffect: {
                 rotate: 20,
                 stretch: 0,
@@ -254,6 +255,12 @@
                 nextEl: ".swiper-button-next",
                 prevEl: ".swiper-button-prev",
             },
+            // Breakpoints para Desktop
+            breakpoints: {
+                768: { // Quando a tela for maior que 768px (Desktop)
+                    loopedSlides: 8, // Aumenta o número de slides clonados para um loop mais suave em telas grandes
+                }
+            }
         });
     </script>
 </body>

@@ -6,7 +6,7 @@
     <title>Crie sua Página Phygital | QR Code Love</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
@@ -173,7 +173,7 @@
                         </div>
                     </div>
 
-                    <div class="p-10 md:p-14 lg:col-span-3 bg-white">
+                    <div class="p-8 md:p-14 lg:col-span-3 bg-white">
                         
                         {% if error %}
                         <div class="mb-8 bg-red-100 border-l-8 border-red-600 p-4 text-red-800 font-bold rounded-r-xl flex items-center animate-bounce-subtle shadow-md">
@@ -182,58 +182,62 @@
                         {% endif %}
 
                         <form method="POST" class="space-y-6">
-                            <div class="grid grid-cols-2 gap-6">
+                            <div class="grid grid-cols-2 gap-5">
                                 <div class="group">
-                                    <label class="block text-sm font-extrabold text-wine-900 uppercase tracking-wider mb-2 ml-1 group-hover:text-neon-pink transition-colors">Seu Nome</label>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Seu Nome</label>
                                     <input type="text" name="nome" required placeholder="Ex: Lucas"
-                                           class="block w-full px-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-bold text-gray-800 placeholder-gray-400">
+                                           class="block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-semibold text-gray-800 placeholder-gray-400 shadow-sm">
                                 </div>
                                 <div class="group">
-                                    <label class="block text-sm font-extrabold text-wine-900 uppercase tracking-wider mb-2 ml-1 group-hover:text-neon-pink transition-colors">Sobrenome</label>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Sobrenome</label>
                                     <input type="text" name="sobrenome" required placeholder="Ex: Silva"
-                                           class="block w-full px-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-bold text-gray-800 placeholder-gray-400">
+                                           class="block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-semibold text-gray-800 placeholder-gray-400 shadow-sm">
                                 </div>
                             </div>
 
                             <div class="group">
-                                <label class="block text-sm font-extrabold text-wine-900 uppercase tracking-wider mb-2 ml-1 group-hover:text-neon-pink transition-colors">WhatsApp</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">WhatsApp</label>
                                 <div class="relative">
-                                    <i data-lucide="phone" class="absolute left-5 top-4.5 w-5 h-5 text-gray-400 group-focus-within:text-neon-pink transition-colors"></i>
+                                    <i data-lucide="phone" class="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-neon-pink transition-colors"></i>
                                     <input type="text" name="whatsapp" required placeholder="(11) 99999-9999"
-                                           class="block w-full pl-14 pr-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-bold text-gray-800 placeholder-gray-400">
+                                           class="block w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-semibold text-gray-800 placeholder-gray-400 shadow-sm">
                                 </div>
                             </div>
 
-                            <div class="group">
-                                <label class="block text-sm font-extrabold text-wine-900 uppercase tracking-wider mb-2 ml-1 group-hover:text-neon-pink transition-colors">Link Personalizado (Slug)</label>
-                                <div class="flex rounded-2xl shadow-sm ring-2 ring-transparent group-focus-within:ring-neon-pink/30 transition-all">
-                                    <span class="inline-flex items-center px-6 rounded-l-2xl border-2 border-r-0 border-gray-200 bg-gray-100 text-wine-900 font-bold text-sm tracking-tight">
-                                        qrcodebrindes.leanttro/
+                            <div class="group bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                <label class="block text-sm font-bold text-gray-800 mb-2">Link Personalizado</label>
+                                
+                                <div class="mb-2">
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-md bg-gray-200 text-gray-600 font-mono text-xs md:text-sm tracking-tight border border-gray-300 w-full md:w-auto">
+                                        qrcodebrindes.leanttro.com/
                                     </span>
-                                    <input type="text" name="slug" id="slugInput" required placeholder="maria-e-joao"
-                                           class="block flex-1 min-w-0 px-5 py-4 border-2 border-gray-200 rounded-r-2xl focus:ring-0 focus:border-neon-pink outline-none bg-white font-black text-xl text-neon-pink placeholder-gray-300 lowercase">
                                 </div>
-                                <p class="text-xs text-gray-500 mt-2 ml-2 flex items-center">
+                                
+                                <div class="relative">
+                                    <input type="text" name="slug" id="slugInput" required placeholder="Digite o final do link (ex: maria-e-joao)"
+                                           class="block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-neon-pink focus:border-neon-pink outline-none font-bold text-lg text-neon-pink placeholder-gray-300 lowercase shadow-sm transition-all">
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2 flex items-center">
                                     <i data-lucide="info" class="w-3 h-3 mr-1"></i> O link será ajustado automaticamente enquanto você digita.
                                 </p>
                             </div>
 
                             <div class="group">
-                                <label class="block text-sm font-extrabold text-wine-900 uppercase tracking-wider mb-2 ml-1 group-hover:text-neon-pink transition-colors">Crie uma Senha de Acesso</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Crie uma Senha de Acesso</label>
                                 <div class="relative">
-                                    <i data-lucide="lock" class="absolute left-5 top-4.5 w-5 h-5 text-gray-400 group-focus-within:text-neon-pink transition-colors"></i>
+                                    <i data-lucide="lock" class="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-neon-pink transition-colors"></i>
                                     <input type="password" name="admin_password" required placeholder="••••••••"
-                                           class="block w-full pl-14 pr-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-bold text-gray-800 placeholder-gray-400">
+                                           class="block w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-semibold text-gray-800 placeholder-gray-400 shadow-sm">
                                 </div>
                             </div>
 
-                            <button type="submit" class="w-full flex items-center justify-center py-5 px-8 border-2 border-transparent rounded-2xl shadow-2xl text-lg font-black text-white bg-gradient-to-r from-neon-pink to-wine-600 hover:from-neon-pink hover:to-neon-pink transition-all transform hover:scale-[1.03] active:scale-95 group relative overflow-hidden">
-                                <span class="relative z-10 flex items-center">GERAR MINHA PÁGINA <i data-lucide="rocket" class="ml-3 w-6 h-6 group-hover:animate-bounce"></i></span>
+                            <button type="submit" class="w-full flex items-center justify-center py-4 px-8 border-2 border-transparent rounded-xl shadow-xl text-lg font-black text-white bg-gradient-to-r from-neon-pink to-wine-600 hover:from-neon-pink hover:to-neon-pink transition-all transform hover:scale-[1.02] active:scale-95 group relative overflow-hidden mt-4">
+                                <span class="relative z-10 flex items-center">GERAR MINHA PÁGINA <i data-lucide="rocket" class="ml-3 w-5 h-5 group-hover:animate-bounce"></i></span>
                                 <div class="absolute inset-0 h-full w-full bg-white/30 skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
                             </button>
                             
                             <p class="text-center text-xs text-gray-400 mt-6">
-                                Protegido por reCAPTCHA e sujeito aos Termos de Uso e Política de Privacidade.
+                                Protegido por reCAPTCHA e sujeito aos Termos de Uso.
                             </p>
                         </form>
                     </div>

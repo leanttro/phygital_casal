@@ -582,6 +582,17 @@ def health_check():
         status['db'] = str(e)
     return jsonify(status)
 
+@app.route('/emergency-reset/<slug>/<new_password>')
+def emergency_reset(slug, new_password):
+    # ATENÇÃO: Apague esta rota assim que terminar de usar
+    page = LovePage.query.filter_by(slug=slug).first()
+    if page:
+        # Gera o hash seguro da nova senha e salva
+        page.admin_password = generate_password_hash(new_password)
+        db.session.commit()
+        return f"SUCESSO: Senha da página '{slug}' atualizada. Tente logar agora."
+    return "ERRO: Slug não encontrado."
+
 if __name__ == '__main__':
     if not os.path.exists(app.config['SESSION_FILE_DIR']):
         os.makedirs(app.config['SESSION_FILE_DIR'])

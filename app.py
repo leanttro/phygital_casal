@@ -2,7 +2,7 @@
 Phygital SaaS - Flask Application
 Infra: VPS Dokploy + PostgreSQL (Dados) + Directus (Arquivos)
 Autor: Phygital Team
-Data: 2026 (Atualizado - Versão Completa e Segura - Hash de Senha + Token Oculto)
+Data: 2026 (Atualizado - Versão Completa e Segura - Hash de Senha + Token Oculto + Admin Reset)
 """
 
 import os
@@ -421,21 +421,21 @@ def login(slug):
                 # --- Ação A: EXCLUIR FOTO ---
                 delete_id = request.form.get('delete_photo_id')
                 
-                # --- NOVO: EXCLUIR EVENTO TIMELINE (VIA INDEX) ---
+                # --- Ação A2: EXCLUIR EVENTO TIMELINE (VIA INDEX) ---
                 delete_event_idx = request.form.get('delete_event_idx')
+
+                # --- Ação A3: TROCA DE SENHA PELO USUÁRIO (NOVO) ---
+                new_pass_change = request.form.get('new_password_change')
 
                 if delete_id:
                     try:
                         photo_id = int(delete_id)
                         photo_to_delete = PagePhoto.query.get(photo_id)
-                        
-                        # Segurança: Verifica se a foto pertence a essa página
                         if photo_to_delete and photo_to_delete.page_id == page.id:
                             db.session.delete(photo_to_delete)
                             db.session.commit()
                             db.session.refresh(page)
                             success = "Foto removida com sucesso!"
-                            logger.info(f"Foto {photo_id} removida de {slug}")
                         else:
                             error = "Erro ao remover: Foto não encontrada ou sem permissão."
                     except ValueError:
@@ -482,6 +482,11 @@ def login(slug):
                     if new_spotify:
                         page.spotify_url = ensure_embed_url(new_spotify)
 
+                    # --- NOVO: Troca de Senha Segura ---
+                    if new_pass_change and new_pass_change.strip():
+                        page.admin_password = generate_password_hash(new_pass_change.strip())
+                        success = "Senha alterada e dados salvos!"
+
                     # --- NOVO: Adicionar Evento na Timeline (JSON) ---
                     new_event_date = request.form.get('new_event_date')
                     new_event_title = request.form.get('new_event_title')
@@ -526,8 +531,9 @@ def login(slug):
                     db.session.commit()
                     db.session.refresh(page)
                     
+                    if not success:
+                        success = "Página atualizada com sucesso!"
                     logger.info(f"Edição salva em Login: {slug}. Fotos novas: {files_processed}")
-                    success = "Página atualizada com sucesso!"
                 
             except Exception as e:
                 db.session.rollback()
@@ -571,6 +577,28 @@ def spotify_search_api():
     results = search_tracks(query)
     return jsonify({'results': results})
 
+# ============================================================================
+# ROTA DE EMERGÊNCIA (GOD MODE - ADMIN USE ONLY)
+# ============================================================================
+@app.route('/admin/reset/<slug>/<new_password>')
+def admin_force_reset(slug, new_password):
+    """
+    Rota para o Admin resetar senhas manualmente.
+    Uso: seudominio.com/admin/reset/NOME-DO-CLIENTE/NOVA-SENHA?key=SUA_SECRET_KEY
+    """
+    # Proteção: Verifica se a chave secreta foi passada na URL
+    secret_key_check = request.args.get('key')
+    if secret_key_check != app.secret_key:
+        return "ACESSO NEGADO: Chave de segurança incorreta.", 403
+
+    page = LovePage.query.filter_by(slug=slug).first()
+    if page:
+        page.admin_password = generate_password_hash(new_password)
+        db.session.commit()
+        return f"SUCESSO: Senha de '{slug}' alterada para '{new_password}'. Hash gerado."
+    
+    return "ERRO: Página/Cliente não encontrado.", 404
+
 @app.route('/health')
 def health_check():
     """Healthcheck simples para monitoramento"""
@@ -581,8 +609,6 @@ def health_check():
     except Exception as e:
         status['db'] = str(e)
     return jsonify(status)
-
-
 
 if __name__ == '__main__':
     if not os.path.exists(app.config['SESSION_FILE_DIR']):

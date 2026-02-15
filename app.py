@@ -327,15 +327,15 @@ def cadastro():
 
 @app.route('/<slug>')
 def love_page(slug):
-    """Rota Pública - Renderiza página do banco ou Redireciona Motoboy"""
+    """Rota Pública - Renderiza página do banco ou Redireciona Motoboys"""
     
     # ============================================================
     # REDIRECIONAMENTO DE EMERGÊNCIA (FIX)
     # ============================================================
     # Verifica se o slug é numérico (ex: 001, 123)
-    # Se for, redireciona para a nova aplicação em motoboy.leanttro.com
+    # Se for, redireciona para a nova aplicação em motoboys.leanttro.com
     if slug.isdigit():
-        return redirect(f"https://motoboy.leanttro.com/{slug}", code=302)
+        return redirect(f"https://motoboys.leanttro.com/{slug}", code=302)
     # ============================================================
 
     try:

@@ -328,6 +328,51 @@ def cadastro():
 @app.route('/<slug>')
 def love_page(slug):
     """Rota Pública - Renderiza página do banco com o TEMA escolhido"""
+    
+    # ============================================================
+    # ENXERTO SOS MOTOBOY - VERIFICAÇÃO DE EMERGÊNCIA
+    # ============================================================
+    try:
+        # Tenta buscar na coleção 'motoboys' do Directus
+        # Reutilizamos a mesma URL e Token que já existem nas variáveis de ambiente
+        sos_headers = {'Authorization': f'Bearer {DIRECTUS_TOKEN}'}
+        sos_url = f"{DIRECTUS_URL}/items/motoboys?filter[slug][_eq]={slug}&limit=1"
+
+        # Timeout curto (2s) para não travar o carregamento da Love Page se não for motoboy
+        sos_response = requests.get(sos_url, headers=sos_headers, timeout=2)
+
+        if sos_response.status_code == 200:
+            sos_data = sos_response.json().get('data')
+            if sos_data:
+                # É UM MOTOBOY! Renderiza o template de emergência imediatamente
+                motoboy = sos_data[0]
+                
+                # Helper interno para imagem do SOS
+                def get_sos_img(img_id):
+                    base = DIRECTUS_URL.rstrip('/')
+                    return f"{base}/assets/{img_id}" if img_id else "https://placehold.co/400x400?text=Sem+Foto"
+                
+                motoboy['foto_url'] = get_sos_img(motoboy.get('foto'))
+                
+                # Cálculo de idade para o SOS
+                idade = ""
+                if motoboy.get('data_nascimento'):
+                    try:
+                        born = datetime.strptime(motoboy['data_nascimento'], "%Y-%m-%d")
+                        today = datetime.today()
+                        idade = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+                    except: pass
+
+                # Retorna o template SOS e INTERROMPE a função aqui (não carrega love page)
+                return render_template('sos_enxerto.html', m=motoboy, idade=idade)
+
+    except Exception as e:
+        # Se der erro na verificação do motoboy, apenas loga e SEGUE O FLUXO NORMAL
+        logger.error(f"Check SOS Motoboy falhou ou não encontrado: {e}")
+    # ============================================================
+    # FIM DO ENXERTO
+    # ============================================================
+
     try:
         # Garante slug limpo na busca
         clean_slug = slug.strip().lower()

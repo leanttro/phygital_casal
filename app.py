@@ -334,7 +334,7 @@ def love_page(slug):
     # ============================================================
     # Verifica se o slug é numérico (ex: 001, 123)
     # Se for, redireciona para a nova aplicação em motoboys.leanttro.com
-    if slug.isdigit():
+    if slug == '001':
         return redirect(f"https://motoboys.leanttro.com/{slug}", code=302)
     # ============================================================
 
@@ -611,7 +611,7 @@ def admin_force_reset(slug, new_password):
 
 @app.route('/health')
 def health_check():
-    """Healthcheck simples para monitoramento"""
+    """Healthcheck simples  para monitoramento"""
     status = {'status': 'ok', 'db': 'unknown'}
     try:
         db.session.execute(db.text('SELECT 1'))

@@ -2,7 +2,7 @@
 Phygital SaaS - Flask Application
 Infra: VPS Dokploy + PostgreSQL (Dados) + Directus (Arquivos)
 Autor: Phygital Team
-Data: 2026 (Atualizado - Segurança Avançada + Recuperação de Senha por E-mail)
+Data: 2026 (Atualizado - Segurança Avançada + Recuperação de Senha + Proxy de Mídia)
 """
 
 import os
@@ -16,7 +16,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from functools import wraps
 from datetime import datetime
-from flask import Flask, render_template, request, session, redirect, url_for, jsonify, abort
+from flask import Flask, render_template, request, session, redirect, url_for, jsonify, abort, Response
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
@@ -122,7 +122,7 @@ class LovePage(db.Model):
     
     nome = db.Column(db.String(100))
     sobrenome = db.Column(db.String(100))
-    email = db.Column(db.String(120)) # Novo campo essencial para recuperação
+    email = db.Column(db.String(120)) 
     whatsapp = db.Column(db.String(50))
     
     theme = db.Column(db.String(50), default='classic') 
@@ -191,9 +191,8 @@ def upload_file_to_directus(file_storage):
             file_data = response.json().get('data', {})
             file_id = file_data.get('id')
             if file_id:
-                full_url = f"{DIRECTUS_URL}/assets/{file_id}"
-                logger.info(f"Upload Directus sucesso (URL Limpa): {full_url}")
-                return full_url
+                # Sistema modificado: agora ele salva a rota de proxy segura
+                return f"/media/{file_id}"
         
         logger.error(f"Erro Directus Upload: {response.status_code} - {response.text}")
         return None
@@ -368,6 +367,23 @@ def reset_senha(token):
 
     return render_template('reset_senha.html', error=error, success=success, token=token)
 
+@app.route('/media/<file_id>')
+def serve_media(file_id):
+    """ Rota proxy blindada para buscar arquivos no Directus com token secreto """
+    clean_id = secure_filename(file_id)
+    url = f"{DIRECTUS_URL}/assets/{clean_id}"
+    try:
+        r = requests.get(url, headers=DIRECTUS_HEADERS, stream=True, timeout=15)
+        if r.status_code == 200:
+            return Response(
+                r.iter_content(chunk_size=8192), 
+                content_type=r.headers.get('Content-Type', 'image/jpeg')
+            )
+    except Exception as e:
+        logger.error(f"Erro no proxy de media: {e}")
+    
+    return abort(404)
+
 @app.route('/<slug>')
 def love_page(slug):
     if slug == '001':
@@ -407,6 +423,13 @@ def love_page(slug):
                 timeline_list = json.loads(page.timeline_data) if page.timeline_data else []
             except:
                 timeline_list = []
+
+        # Auto-correção dinâmica para as fotos já enviadas (muda o link antigo para o novo proxy)
+        if page.photos:
+            for photo in page.photos:
+                if photo.image_url and photo.image_url.startswith('http') and '/assets/' in photo.image_url:
+                    extracted_id = photo.image_url.split('/assets/')[-1]
+                    photo.image_url = f"/media/{extracted_id}"
 
         return render_template(
             template_name,
@@ -572,6 +595,11 @@ def login(slug):
 
     if page.photos:
         page.photos.sort(key=lambda x: x.display_order)
+        # Auto-correção dinâmica para as fotos já enviadas no painel
+        for photo in page.photos:
+            if photo.image_url and photo.image_url.startswith('http') and '/assets/' in photo.image_url:
+                extracted_id = photo.image_url.split('/assets/')[-1]
+                photo.image_url = f"/media/{extracted_id}"
 
     if isinstance(page.timeline_data, list):
         timeline_display = page.timeline_data

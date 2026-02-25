@@ -380,7 +380,12 @@ def love_page(slug):
         if not page:
             return render_template('404.html', slug=slug), 404
         
-        template_name = 'theme_elegant.html' if page.theme == 'elegant' else 'index.html'
+        if page.theme == 'elegant':
+            template_name = 'theme_elegant.html'
+        elif page.theme == 'stitch':
+            template_name = 'stitch.html'
+        else:
+            template_name = 'index.html'
         
         fonts_map = {
             'sans': 'Inter, sans-serif',

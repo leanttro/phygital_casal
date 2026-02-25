@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }} | Ohana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;1,400&family=Great+Vibes&family=Fira+Code&family=Courier+Prime&family=Fredoka:wght@400;600;700&display=swap');
+
+        body {
+            /* Fallback font to Fredoka for a more cartoonish/playful look if sans is chosen */
+            font-family: {{ font_css | safe }};
+            background-color: {{ page.background_color }};
+            overflow-x: hidden;
+        }
+
+        /* Se a fonte for sans, força a Fredoka para dar a vibe animada do Stitch */
+        {% if page.font_style == 'sans' %}
+        body { font-family: 'Fredoka', sans-serif; }
+        {% endif %}
+
+        .dynamic-title { color: {{ page.title_color }}; }
+        .dynamic-text { 
+            color: {{ page.font_color }}; 
+            font-size: {{ font_size_val }}; 
+        }
+
+        .spin-slow { animation: spin 8s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .float-animation { animation: float 6s ease-in-out infinite; }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* Vibe Desenho Animado - Bordas grossas e sombras marcadas */
+        .cartoon-shadow {
+            box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.15);
+            border: 3px solid rgba(255, 255, 255, 0.4);
+        }
+
+        /* Custom Swiper Styles (Mantendo proporções originais) */
+        .swiper {
+            width: 100%;
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+
+        .swiper-slide {
+            background-position: center;
+            background-size: cover;
+            /* Lógica de Proporção Dinâmica */
+            {% if page.aspect_ratio == 'story' %}
+                width: 280px;
+                height: 497px; /* 9:16 vertical */
+            {% else %}
+                width: 320px;
+                height: 320px; /* 1:1 quadrada */
+            {% endif %}
+            border-radius: 2rem;
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.2);
+            border: 4px solid #fff;
+            overflow: hidden;
+        }
+
+        @media (max-width: 640px) {
+            .swiper-slide {
+                {% if page.aspect_ratio == 'story' %}
+                    width: 220px;
+                    height: 391px;
+                {% else %}
+                    width: 260px;
+                    height: 260px;
+                {% endif %}
+            }
+        }
+
+        .swiper-slide img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 1.5rem;
+        }
+
+        .swiper-button-next, .swiper-button-prev {
+            color: {{ page.title_color }};
+            background: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid rgba(0,0,0,0.1);
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
+        }
+
+        .swiper-button-next:after, .swiper-button-prev:after {
+            font-size: 1.4rem;
+            font-weight: 900;
+        }
+
+        /* Estilos da Linha do Tempo Estilo Pegadas na Areia */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -11px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-image: linear-gradient(to bottom, {{ page.title_color }} 50%, rgba(255,255,255,0) 0%);
+            background-position: right;
+            background-size: 4px 15px;
+            background-repeat: repeat-y;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative">
+
+    {% set layout = page.layout_order.split(',') %}
+    {% for section in layout %}
+
+        {% if section == 'header' %}
+        <header class="relative h-[70vh] flex flex-col items-center justify-center overflow-hidden">
+            {% if page.photos %}
+            <div class="absolute inset-0">
+                <img src="{{ page.photos[0].image_url }}" class="w-full h-full object-cover blur-sm opacity-60 scale-110">
+                <div class="absolute inset-0 bg-gradient-to-b from-blue-900/30 to-purple-900/30 backdrop-blur-sm"></div>
+            </div>
+            {% endif %}
+            
+            <div class="relative z-10 text-center p-10 bg-white/40 backdrop-blur-md rounded-[3rem] cartoon-shadow max-w-2xl mx-4 float-animation">
+                <div class="mb-4 flex justify-center space-x-2" style="color: {{ page.title_color }};">
+                    <i data-lucide="flower-2" class="w-8 h-8 fill-current animate-spin-slow"></i>
+                    <i data-lucide="heart" class="w-10 h-10 fill-current"></i>
+                    <i data-lucide="flower-2" class="w-8 h-8 fill-current animate-spin-slow" style="animation-direction: reverse;"></i>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-black mb-4 leading-tight tracking-wide" style="color: {{ page.title_color }}; text-shadow: 2px 2px 0px rgba(255,255,255,0.5);">
+                    {{ page.title }}
+                </h1>
+                <div class="w-32 h-2 mx-auto rounded-full opacity-70" style="background-color: {{ page.title_color }};"></div>
+            </div>
+
+            <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-20">
+                <svg viewBox="0 0 1200 120" preserveAspectRatio="none" class="relative block w-full h-[60px] md:h-[100px]">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118,152.47,120.3,222.7,111.11C259.24,106.32,291.6,90.2,321.39,56.44Z" style="fill: {{ page.background_color }};"></path>
+                </svg>
+            </div>
+        </header>
+        {% endif %}
+
+        {% if section == 'text' %}
+        <section class="min-h-[40vh] flex flex-col justify-center items-center py-16 px-6 max-w-3xl mx-auto text-center relative z-10">
+            <div class="bg-white/20 p-8 md:p-12 rounded-[3rem] cartoon-shadow relative backdrop-blur-sm">
+                <i data-lucide="sun" class="absolute -top-6 -left-6 w-14 h-14 opacity-80 animate-spin-slow" style="color: {{ page.title_color }};"></i>
+                <div class="dynamic-text mx-auto leading-relaxed font-medium">
+                    {{ page.message | replace('\n', '<br>') | safe }}
+                </div>
+                <i data-lucide="waves" class="absolute -bottom-6 -right-6 w-14 h-14 opacity-80" style="color: {{ page.title_color }};"></i>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if section == 'spotify' and page.spotify_url %}
+        <section class="py-16 relative z-10">
+            <div class="container mx-auto px-4 max-w-4xl">
+                <div class="flex flex-col md:flex-row items-center gap-8 bg-white/40 backdrop-blur-md p-8 rounded-[3rem] cartoon-shadow">
+                    
+                    <div class="w-full md:w-1/3 flex justify-center relative">
+                        <div class="relative w-52 h-52 md:w-64 md:h-64 rounded-full overflow-hidden border-8 shadow-xl" style="border-color: {{ page.title_color }}; background-color: {{ page.background_color }};">
+                            {% if page.photos %}
+                                <img src="{{ page.photos[0].image_url }}" class="w-full h-full object-cover opacity-90 spin-slow">
+                            {% else %}
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <i data-lucide="music-4" class="w-16 h-16 opacity-50" style="color: {{ page.title_color }};"></i>
+                                </div>
+                            {% endif %}
+                            <div class="absolute inset-0 m-auto w-10 h-10 rounded-full border-4 z-10" style="background-color: {{ page.background_color }}; border-color: {{ page.title_color }};"></div>
+                        </div>
+                    </div>
+
+                    <div class="w-full md:w-2/3 text-center md:text-left">
+                        <div class="flex items-center justify-center md:justify-start gap-2 mb-3">
+                            <i data-lucide="radio" class="w-6 h-6" style="color: {{ page.title_color }};"></i>
+                            <h3 class="text-lg font-black tracking-widest dynamic-title uppercase">Nossa Trilha Ohana</h3>
+                        </div>
+                        <div class="rounded-2xl overflow-hidden border-4" style="border-color: {{ page.title_color }};">
+                            <iframe src="{{ page.spotify_url }}" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" class="block"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if section == 'timeline' and timeline_events %}
+        <section class="pt-12 pb-20 px-4 max-w-3xl mx-auto relative z-10">
+            <div class="text-center mb-16 relative">
+                <i data-lucide="palmtree" class="w-12 h-12 mx-auto mb-2 opacity-80" style="color: {{ page.title_color }};"></i>
+                <h2 class="text-4xl font-black mb-2 dynamic-title tracking-wide">Nossa História</h2>
+                <div class="w-16 h-2 rounded-full mx-auto opacity-50" style="background-color: {{ page.title_color }};"></div>
+            </div>
+
+            <div class="space-y-10 ml-6 border-l-4 border-transparent">
+                {% for event in timeline_events %}
+                <div class="relative pl-10 timeline-item group">
+                    <div class="absolute left-[-26px] top-0 w-12 h-12 rounded-full border-4 flex items-center justify-center shadow-md bg-white z-10 transition-transform group-hover:scale-110 group-hover:rotate-12" style="border-color: {{ page.title_color }};">
+                        <i data-lucide="flower" class="w-6 h-6" style="color: {{ page.title_color }};"></i>
+                    </div>
+                    
+                    <div class="bg-white/50 backdrop-blur-md p-6 rounded-[2rem] cartoon-shadow transition-transform group-hover:-translate-y-1">
+                        <div class="inline-block px-5 py-2 rounded-full mb-3 border-2" style="background-color: {{ page.title_color }}; border-color: rgba(0,0,0,0.1);">
+                            <span class="text-sm font-black uppercase tracking-widest" style="color: {{ page.background_color }};">
+                                {% set parts = event.date.split('-') %}
+                                {{ parts[2] }}/{{ parts[1] }}/{{ parts[0] }}
+                            </span>
+                        </div>
+                        <h3 class="text-2xl font-bold mt-1" style="color: {{ page.title_color }};">{{ event.title }}</h3>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        {% if section == 'photos' and page.photos %}
+        <section class="pt-10 pb-16 px-4 relative z-10 overflow-hidden">
+            <div class="text-center mb-10">
+                <h2 class="text-4xl font-black mb-2 dynamic-title tracking-wide">{{ page.gallery_title }}</h2>
+                <div class="w-16 h-2 rounded-full mx-auto opacity-50 mb-4" style="background-color: {{ page.title_color }};"></div>
+                <i data-lucide="camera" class="w-8 h-8 mx-auto opacity-60" style="color: {{ page.title_color }};"></i>
+            </div>
+            
+            <div class="max-w-6xl mx-auto relative px-4">
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper">
+                        {% for photo in page.photos %}
+                        <div class="swiper-slide">
+                            <img src="{{ photo.image_url }}" alt="Momento {{ loop.index }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if section == 'footer' %}
+        <footer class="mt-auto relative z-10">
+            <div class="w-full overflow-hidden leading-none rotate-180">
+                <svg viewBox="0 0 1200 120" preserveAspectRatio="none" class="relative block w-full h-[40px] md:h-[80px]">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118,152.47,120.3,222.7,111.11C259.24,106.32,291.6,90.2,321.39,56.44Z" fill="#111827"></path>
+                </svg>
+            </div>
+            
+            <div class="bg-gray-900 text-white text-center py-12 px-4">
+                <div class="flex justify-center items-center gap-2 mb-4 text-pink-400">
+                    <i data-lucide="flower-2" class="w-5 h-5"></i>
+                    <span class="font-bold tracking-widest uppercase">Ohana significa família</span>
+                    <i data-lucide="flower-2" class="w-5 h-5"></i>
+                </div>
+                
+                <p class="font-medium">
+                    <a href="https://www.qrcodebrindes.com.br" target="_blank" class="hover:text-pink-400 transition-colors">
+                        Feito com ♥ por QRCODEBRINDES.com.br
+                    </a>
+                </p>
+                <p class="mt-2 text-sm text-gray-500">{{ current_year }}</p>
+                
+                {% if page.slug %}
+                <a href="/{{ page.slug }}/login" class="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-gray-800 rounded-full hover:bg-gray-700 transition text-sm font-bold border-2 border-gray-700">
+                    <i data-lucide="settings" class="w-4 h-4"></i> Admin Panel
+                </a>
+                {% endif %}
+            </div>
+        </footer>
+        {% endif %}
+
+    {% endfor %}
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        lucide.createIcons();
+
+        var swiper = new Swiper(".mySwiper", {
+            effect: "coverflow",
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: "auto",
+            loop: true,
+            loopedSlides: 4, 
+            coverflowEffect: {
+                rotate: 15, // Um pouco menos de rotação para não distorcer muito a "foto"
+                stretch: 0,
+                depth: 200, // Um pouco mais de profundidade para saltar mais
+                modifier: 1,
+                slideShadows: true,
+            },
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            breakpoints: {
+                768: {
+                    loopedSlides: 8,
+                }
+            }
+        });
+    </script>
+</body>
+</html>

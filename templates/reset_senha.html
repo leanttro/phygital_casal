@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Senha | QR Code Love</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans text-gray-800 flex items-center justify-center p-4">
+
+    <div class="max-w-md w-full bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+        <div class="p-8 pb-6 text-center">
+            <div class="mx-auto bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-green-500">
+                <i data-lucide="key-round" class="w-8 h-8"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900">Criar Nova Senha</h2>
+            <p class="text-gray-500 text-sm mt-2">
+                Digite sua nova senha abaixo.
+            </p>
+        </div>
+
+        <div class="px-8 pb-8">
+            {% if error %}
+            <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-3 text-sm text-red-700 rounded shadow-sm">
+                {{ error }}
+            </div>
+            <div class="text-center mt-4">
+                <a href="{{ url_for('esqueci_senha') }}" class="text-sm text-pink-600 font-bold hover:underline">Tentar novamente</a>
+            </div>
+            {% elif success %}
+            <div class="mb-4 bg-green-50 border-l-4 border-green-500 p-3 text-sm text-green-700 rounded shadow-sm">
+                {{ success }}
+            </div>
+            <div class="text-center mt-4">
+                <a href="{{ url_for('cadastro') }}" class="text-sm text-pink-600 font-bold hover:underline">Voltar para o início</a>
+            </div>
+            {% else %}
+            
+            <form method="POST" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nova Senha</label>
+                    <input type="password" name="password" required placeholder="••••••••" minlength="6"
+                           class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition-all">
+                </div>
+
+                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-all">
+                    Salvar Nova Senha
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

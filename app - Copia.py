@@ -2,7 +2,7 @@
 Phygital SaaS - Flask Application
 Infra: VPS Dokploy + PostgreSQL (Dados) + Directus (Arquivos)
 Autor: Phygital Team
-Data: 2026 (Atualizado - Versão Completa e Segura - Com Token Embutido)
+Data: 2026 (Atualizado - Versão Completa e Segura - Hash de Senha + Token Oculto + Admin Reset)
 """
 
 import os
@@ -16,6 +16,7 @@ from flask import Flask, render_template, request, session, redirect, url_for, j
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash # IMPORT DE SEGURANÇA
 from dotenv import load_dotenv
 
 # ============================================================================
@@ -101,7 +102,8 @@ class LovePage(db.Model):
     message = db.Column(db.Text)
     background_color = db.Column(db.String(20), default='#FF6B8B')
     spotify_url = db.Column(db.String(500))
-    admin_password = db.Column(db.String(100)) # Plaintext (conforme solicitado)
+    # Aumentei para 255 para caber o Hash gerado pelo Werkzeug com segurança
+    admin_password = db.Column(db.String(255)) 
     
     # NOVOS CAMPOS PARA CADASTRO
     nome = db.Column(db.String(100))
@@ -143,7 +145,9 @@ class PagePhoto(db.Model):
 
 def upload_file_to_directus(file_storage):
     """
-    Envia arquivo para o Directus e retorna a URL pública do asset COM TOKEN EMBUTIDO.
+    Envia arquivo para o Directus e retorna a URL pública do asset.
+    IMPORTANTE: O token é usado APENAS no backend. A URL retornada é pública.
+    Certifique-se que a role 'Public' no Directus tem permissão de LEITURA (Read) em 'directus_files'.
     """
     try:
         url = f"{DIRECTUS_URL}/files"
@@ -152,7 +156,7 @@ def upload_file_to_directus(file_storage):
         # Prepara o arquivo para envio via multipart/form-data
         files = {'file': (filename, file_storage, file_storage.mimetype)}
         
-        # Headers (sem Content-Type json)
+        # Headers (sem Content-Type json) - Token Seguro aqui
         headers = {'Authorization': f'Bearer {DIRECTUS_TOKEN}'}
         
         response = requests.post(url, headers=headers, files=files, timeout=30)
@@ -161,12 +165,12 @@ def upload_file_to_directus(file_storage):
             file_data = response.json().get('data', {})
             file_id = file_data.get('id')
             if file_id:
-                # --- MODIFICAÇÃO NUCLEAR ---
-                # Adiciona o token na URL salva no banco.
-                # Isso garante acesso mesmo se a permissão 'Public' falhar.
-                full_url = f"{DIRECTUS_URL}/assets/{file_id}?access_token={DIRECTUS_TOKEN}"
+                # --- MODIFICAÇÃO DE SEGURANÇA ---
+                # NÃO embutimos mais o token na URL.
+                # A URL agora depende da permissão pública do Directus.
+                full_url = f"{DIRECTUS_URL}/assets/{file_id}"
                 
-                logger.info(f"Upload Directus sucesso (Token Embutido): {full_url}")
+                logger.info(f"Upload Directus sucesso (URL Limpa): {full_url}")
                 return full_url
         
         logger.error(f"Erro Directus Upload: {response.status_code} - {response.text}")
@@ -272,15 +276,23 @@ def cadastro():
     """Rota de Cadastro de novos usuários/páginas"""
     error = None
     if request.method == 'POST':
-        slug = request.form.get('slug', '').strip().lower()
+        # SEGURANÇA: Limpa e padroniza o slug no backend
+        raw_slug = request.form.get('slug', '').strip().lower()
+        # Remove caracteres indesejados se passaram pelo front
+        slug = re.sub(r'[^a-z0-9-]', '', raw_slug)
+
         nome = request.form.get('nome', '').strip()
         sobrenome = request.form.get('sobrenome', '').strip()
         whatsapp = request.form.get('whatsapp', '').strip()
-        password = request.form.get('admin_password', '').strip()
+        
+        # SEGURANÇA: Captura senha e gera Hash
+        password_plain = request.form.get('admin_password', '').strip()
 
         # Validação básica
-        if not re.match(r'^[a-z0-9-]+$', slug):
-            error = "O link deve conter apenas letras minúsculas, números e traços."
+        if not slug:
+            error = "O link é obrigatório."
+        elif not password_plain:
+             error = "A senha é obrigatória."
         else:
             # Verifica se o slug já existe
             existing = LovePage.query.filter_by(slug=slug).first()
@@ -288,12 +300,15 @@ def cadastro():
                 error = "Este link já está em uso. Escolha outro."
             else:
                 try:
+                    # Gera o Hash seguro da senha
+                    hashed_password = generate_password_hash(password_plain)
+
                     new_page = LovePage(
                         slug=slug,
                         nome=nome,
                         sobrenome=sobrenome,
                         whatsapp=whatsapp,
-                        admin_password=password,
+                        admin_password=hashed_password, # Salva o Hash, nunca a senha pura
                         title=f"Página de {nome}",
                         message="Bem-vindos à nossa história de amor!"
                     )
@@ -312,9 +327,21 @@ def cadastro():
 
 @app.route('/<slug>')
 def love_page(slug):
-    """Rota Pública - Renderiza página do banco com o TEMA escolhido"""
+    """Rota Pública - Renderiza página do banco ou Redireciona Motoboys"""
+    
+    # ============================================================
+    # REDIRECIONAMENTO DE EMERGÊNCIA (FIX)
+    # ============================================================
+    # Verifica se o slug é numérico (ex: 001, 123)
+    # Se for, redireciona para a nova aplicação em motoboys.leanttro.com
+    if slug == '001':
+        return redirect(f"https://motoboys.leanttro.com/{slug}", code=302)
+    # ============================================================
+
     try:
-        page = LovePage.query.filter_by(slug=slug).first()
+        # Garante slug limpo na busca
+        clean_slug = slug.strip().lower()
+        page = LovePage.query.filter_by(slug=clean_slug).first()
         
         if not page:
             # Se não achou no banco, renderiza o 404 personalizado
@@ -375,8 +402,11 @@ def login(slug):
     if request.method == 'POST':
         # --- CASO 1: Tentativa de Login (Formulário de Senha) ---
         if 'password' in request.form:
-            password = request.form.get('password')
-            if page.admin_password == password:
+            password_attempt = request.form.get('password')
+            
+            # SEGURANÇA: Verifica Hash ao invés de texto plano
+            # check_password_hash(hash_do_banco, senha_digitada)
+            if page.admin_password and check_password_hash(page.admin_password, password_attempt):
                 session['admin_slug'] = slug
                 session.permanent = True
                 is_logged_in = True
@@ -401,21 +431,21 @@ def login(slug):
                 # --- Ação A: EXCLUIR FOTO ---
                 delete_id = request.form.get('delete_photo_id')
                 
-                # --- NOVO: EXCLUIR EVENTO TIMELINE (VIA INDEX) ---
+                # --- Ação A2: EXCLUIR EVENTO TIMELINE (VIA INDEX) ---
                 delete_event_idx = request.form.get('delete_event_idx')
+
+                # --- Ação A3: TROCA DE SENHA PELO USUÁRIO (NOVO) ---
+                new_pass_change = request.form.get('new_password_change')
 
                 if delete_id:
                     try:
                         photo_id = int(delete_id)
                         photo_to_delete = PagePhoto.query.get(photo_id)
-                        
-                        # Segurança: Verifica se a foto pertence a essa página
                         if photo_to_delete and photo_to_delete.page_id == page.id:
                             db.session.delete(photo_to_delete)
                             db.session.commit()
                             db.session.refresh(page)
                             success = "Foto removida com sucesso!"
-                            logger.info(f"Foto {photo_id} removida de {slug}")
                         else:
                             error = "Erro ao remover: Foto não encontrada ou sem permissão."
                     except ValueError:
@@ -462,6 +492,11 @@ def login(slug):
                     if new_spotify:
                         page.spotify_url = ensure_embed_url(new_spotify)
 
+                    # --- NOVO: Troca de Senha Segura ---
+                    if new_pass_change and new_pass_change.strip():
+                        page.admin_password = generate_password_hash(new_pass_change.strip())
+                        success = "Senha alterada e dados salvos!"
+
                     # --- NOVO: Adicionar Evento na Timeline (JSON) ---
                     new_event_date = request.form.get('new_event_date')
                     new_event_title = request.form.get('new_event_title')
@@ -506,8 +541,9 @@ def login(slug):
                     db.session.commit()
                     db.session.refresh(page)
                     
+                    if not success:
+                        success = "Página atualizada com sucesso!"
                     logger.info(f"Edição salva em Login: {slug}. Fotos novas: {files_processed}")
-                    success = "Página atualizada com sucesso!"
                 
             except Exception as e:
                 db.session.rollback()
@@ -551,9 +587,31 @@ def spotify_search_api():
     results = search_tracks(query)
     return jsonify({'results': results})
 
+# ============================================================================
+# ROTA DE EMERGÊNCIA (GOD MODE - ADMIN USE ONLY)
+# ============================================================================
+@app.route('/admin/reset/<slug>/<new_password>')
+def admin_force_reset(slug, new_password):
+    """
+    Rota para o Admin resetar senhas manualmente.
+    Uso: seudominio.com/admin/reset/NOME-DO-CLIENTE/NOVA-SENHA?key=SUA_SECRET_KEY
+    """
+    # Proteção: Verifica se a chave secreta foi passada na URL
+    secret_key_check = request.args.get('key')
+    if secret_key_check != app.secret_key:
+        return "ACESSO NEGADO: Chave de segurança incorreta.", 403
+
+    page = LovePage.query.filter_by(slug=slug).first()
+    if page:
+        page.admin_password = generate_password_hash(new_password)
+        db.session.commit()
+        return f"SUCESSO: Senha de '{slug}' alterada para '{new_password}'. Hash gerado."
+    
+    return "ERRO: Página/Cliente não encontrado.", 404
+
 @app.route('/health')
 def health_check():
-    """Healthcheck simples para monitoramento"""
+    """Healthcheck simples  para monitoramento"""
     status = {'status': 'ok', 'db': 'unknown'}
     try:
         db.session.execute(db.text('SELECT 1'))
@@ -568,6 +626,7 @@ if __name__ == '__main__':
 
     with app.app_context():
         try:
+            # Em produção, use Alembic para migrações em vez de create_all
             db.create_all()
         except Exception as e:
             logger.error(f"Erro ao inicializar DB: {e}")

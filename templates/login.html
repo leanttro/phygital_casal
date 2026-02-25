@@ -13,13 +13,12 @@
     <style>
         .sortable-ghost {
             opacity: 0.4;
-            background-color: #fce7f3; /* Rosa claro quando arrastando */
+            background-color: #fce7f3; 
             border: 2px dashed #db2777;
         }
         .sortable-drag {
             cursor: grabbing;
         }
-        /* Estilo para os quadradinhos de cores */
         .color-preset {
             width: 32px;
             height: 32px;
@@ -32,7 +31,6 @@
         .color-preset:hover {
             transform: scale(1.1);
         }
-        /* Ajuste do Driver.js */
         .driver-popover.driverjs-theme {
             background-color: #ffffff;
             color: #1f2937;
@@ -401,7 +399,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-1">
                             <label class="block text-sm font-medium text-gray-700">Senha de Acesso</label>
-                            <a href="https://wa.me/5511999999999?text=Ola,+esqueci+minha+senha+da+pagina+QR+Code+Love.+Pode+me+ajudar?" target="_blank" class="text-xs font-bold text-pink-600 hover:text-pink-800 transition-colors">
+                            <a href="{{ url_for('esqueci_senha') }}" class="text-xs font-bold text-pink-600 hover:text-pink-800 transition-colors">
                                 Esqueceu a senha?
                             </a>
                         </div>
@@ -426,7 +424,6 @@
             document.getElementById(id).value = val;
         }
 
-        // --- Configuração do TOUR (Driver.js) ---
         const driver = window.driver.js.driver;
         const tourDriver = driver({
             showProgress: true,
@@ -480,7 +477,6 @@
             tourDriver.drive();
         }
 
-        // Inicia o tour automaticamente na primeira visita
         {% if is_logged_in %}
             document.addEventListener('DOMContentLoaded', function() {
                 if (!localStorage.getItem('hasSeenTour_v1')) {
@@ -489,9 +485,7 @@
                 }
             });
         {% endif %}
-        // ----------------------------------------
 
-        // 1. Drag & Drop das FOTOS
         const grid = document.getElementById('photo-grid');
         if (grid) {
             new Sortable(grid, {
@@ -509,7 +503,6 @@
             });
         }
 
-        // 2. Drag & Drop das SEÇÕES
         const sectionList = document.getElementById('section-sort-list');
         if (sectionList) {
             new Sortable(sectionList, {

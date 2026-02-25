@@ -15,9 +15,9 @@
                     fontFamily: { sans: ['Montserrat', 'sans-serif'] },
                     colors: {
                         wine: {
-                            800: '#9D174D', // Vinho vibrante
-                            900: '#831843', // Vinho profundo
-                            950: '#500724'  // Vinho escuro
+                            800: '#9D174D', 
+                            900: '#831843', 
+                            950: '#500724'  
                         },
                         neon: {
                             pink: '#FF007F',
@@ -42,7 +42,6 @@
         }
     </script>
     <style>
-        /* Utilitários de Animação ao Scroll */
         .reveal {
             opacity: 0;
             transform: translateY(40px) scale(0.95);
@@ -53,7 +52,6 @@
             transform: translateY(0) scale(1);
         }
         
-        /* Glassmorphism mais forte */
         .glass-strong {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(16px);
@@ -62,7 +60,6 @@
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
 
-        /* Fundo animado */
         .animated-bg {
              background: linear-gradient(-45deg, #500724, #831843, #3b0764, #be185d);
 	         background-size: 400% 400%;
@@ -192,6 +189,15 @@
                                     <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Sobrenome</label>
                                     <input type="text" name="sobrenome" required placeholder="Ex: Silva"
                                            class="block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-semibold text-gray-800 placeholder-gray-400 shadow-sm">
+                                </div>
+                            </div>
+
+                            <div class="group">
+                                <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Seu E-mail (Para recuperar senha)</label>
+                                <div class="relative">
+                                    <i data-lucide="mail" class="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-neon-pink transition-colors"></i>
+                                    <input type="email" name="email" required placeholder="seu@email.com"
+                                           class="block w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-neon-pink/20 focus:border-neon-pink transition-all outline-none font-semibold text-gray-800 placeholder-gray-400 shadow-sm">
                                 </div>
                             </div>
 
@@ -351,10 +357,8 @@
     </footer>
 
     <script>
-        // Inicializa Ícones
         lucide.createIcons();
 
-        // --- SCRIPT DE NAVBAR DINÂMICA ---
         const nav = document.getElementById('mainNav');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
@@ -368,7 +372,6 @@
             }
         });
 
-        // --- SCRIPT PARA LIMPEZA AUTOMÁTICA DO SLUG ---
         const slugInput = document.getElementById('slugInput');
         if (slugInput) {
             slugInput.addEventListener('keyup', function(e) {
@@ -384,7 +387,6 @@
             });
         }
 
-        // --- SCRIPT DE ANIMAÇÃO AO SCROLL ---
         const observerOptions = {
             root: null,
             rootMargin: '0px',

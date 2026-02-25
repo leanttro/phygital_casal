@@ -2,7 +2,7 @@
 Phygital SaaS - Flask Application
 Infra: VPS Dokploy + PostgreSQL (Dados) + Directus (Arquivos)
 Autor: Phygital Team
-Data: 2026 (Atualizado - Segurança Avançada + Recuperação de Senha + Proxy de Mídia)
+Data: 2026 (Atualizado - Segurança Avançada + Proxy e Migração Definitiva)
 """
 
 import os
@@ -150,6 +150,36 @@ class PagePhoto(db.Model):
     display_order = db.Column(db.Integer, default=0)
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
+# ============================================================================
+# INICIALIZAÇÃO E MIGRAÇÃO AUTOMÁTICA DE FOTOS (Roda no boot do Gunicorn)
+# ============================================================================
+with app.app_context():
+    try:
+        # Cria as tabelas se não existirem
+        db.create_all()
+        
+        # SCRIPT DE AUTO-CORREÇÃO DEFINITIVO:
+        # Varre o banco procurando fotos que ainda têm a URL completa (velha) do Directus
+        old_photos = PagePhoto.query.filter(PagePhoto.image_url.like('%/assets/%')).all()
+        migrated_count = 0
+        
+        for photo in old_photos:
+            if photo.image_url.startswith('http'):
+                # Isola apenas o ID da imagem (UUID)
+                extracted_id = photo.image_url.split('/assets/')[-1].split('?')[0]
+                # Salva a rota do novo proxy
+                photo.image_url = f"/media/{extracted_id}"
+                migrated_count += 1
+        
+        # Comita a mudança de uma vez por todas no banco
+        if migrated_count > 0:
+            db.session.commit()
+            logger.info(f"SUCESSO: {migrated_count} fotos antigas corrigidas e migradas permanentemente para o Proxy!")
+            
+    except Exception as e:
+        logger.error(f"Erro na verificação/migração do banco de dados: {e}")
+
 # ============================================================================
 # FUNÇÕES DE SERVIÇO (E-MAIL, DIRECTUS, SPOTIFY)
 # ============================================================================
@@ -191,7 +221,7 @@ def upload_file_to_directus(file_storage):
             file_data = response.json().get('data', {})
             file_id = file_data.get('id')
             if file_id:
-                # Sistema modificado: agora ele salva a rota de proxy segura
+                # Retorna o caminho limpo do Proxy (Protegido contra bloqueios de CORS do navegador)
                 return f"/media/{file_id}"
         
         logger.error(f"Erro Directus Upload: {response.status_code} - {response.text}")
@@ -367,10 +397,10 @@ def reset_senha(token):
 
     return render_template('reset_senha.html', error=error, success=success, token=token)
 
-@app.route('/media/<file_id>')
+@app.route('/media/<path:file_id>')
 def serve_media(file_id):
-    """ Rota proxy blindada para buscar arquivos no Directus com token secreto """
-    clean_id = secure_filename(file_id)
+    """ Rota proxy blindada para buscar arquivos no Directus via backend """
+    clean_id = file_id.split('?')[0].split('/')[0]
     url = f"{DIRECTUS_URL}/assets/{clean_id}"
     try:
         r = requests.get(url, headers=DIRECTUS_HEADERS, stream=True, timeout=15)
@@ -424,13 +454,6 @@ def love_page(slug):
             except:
                 timeline_list = []
 
-        # Auto-correção dinâmica para as fotos já enviadas (muda o link antigo para o novo proxy)
-        if page.photos:
-            for photo in page.photos:
-                if photo.image_url and photo.image_url.startswith('http') and '/assets/' in photo.image_url:
-                    extracted_id = photo.image_url.split('/assets/')[-1]
-                    photo.image_url = f"/media/{extracted_id}"
-
         return render_template(
             template_name,
             page=page,
@@ -467,7 +490,6 @@ def login(slug):
                     session['admin_slug'] = slug
                     session.permanent = True
                     is_logged_in = True
-                    # Reseta as falhas deste IP se logar com sucesso
                     if ip in failed_logins:
                         del failed_logins[ip]
                     logger.info(f"Login efetuado para: {slug}")
@@ -595,11 +617,6 @@ def login(slug):
 
     if page.photos:
         page.photos.sort(key=lambda x: x.display_order)
-        # Auto-correção dinâmica para as fotos já enviadas no painel
-        for photo in page.photos:
-            if photo.image_url and photo.image_url.startswith('http') and '/assets/' in photo.image_url:
-                extracted_id = photo.image_url.split('/assets/')[-1]
-                photo.image_url = f"/media/{extracted_id}"
 
     if isinstance(page.timeline_data, list):
         timeline_display = page.timeline_data
@@ -656,15 +673,11 @@ def health_check():
         status['db'] = str(e)
     return jsonify(status)
 
+# Em produção com Gunicorn, esse bloco abaixo não executa.
+# É por isso que a migração foi colocada de forma global lá em cima no "app.app_context()".
 if __name__ == '__main__':
     if not os.path.exists(app.config['SESSION_FILE_DIR']):
         os.makedirs(app.config['SESSION_FILE_DIR'])
-
-    with app.app_context():
-        try:
-            db.create_all()
-        except Exception as e:
-            logger.error(f"Erro ao inicializar DB: {e}")
 
     app.run(
         host='0.0.0.0',

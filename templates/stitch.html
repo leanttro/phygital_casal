@@ -186,10 +186,10 @@
                     <div class="w-full md:w-2/3 text-center md:text-left">
                         <div class="flex items-center justify-center md:justify-start gap-2 mb-3">
                             <i data-lucide="radio" class="w-6 h-6" style="color: {{ page.title_color }};"></i>
-                            <h3 class="text-lg font-black tracking-widest dynamic-title uppercase">Nossa Trilha Ohana</h3>
+                            <h3 class="text-lg font-black tracking-widest dynamic-title">Nossa Trilha Ohana</h3>
                         </div>
-                        <div class="rounded-2xl overflow-hidden border-4" style="border-color: {{ page.title_color }};">
-                            <iframe src="{{ page.spotify_url }}" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" class="block"></iframe>
+                        <div class="rounded-2xl overflow-hidden border-4 bg-black" style="border-color: {{ page.title_color }};">
+                            <iframe src="{{ page.spotify_url }}{% if '?' in page.spotify_url %}&{% else %}?{% endif %}theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" class="block bg-black"></iframe>
                         </div>
                     </div>
                 </div>
@@ -262,7 +262,7 @@
             <div class="bg-gray-900 text-white text-center py-12 px-4">
                 <div class="flex justify-center items-center gap-2 mb-4 text-pink-400">
                     <i data-lucide="flower-2" class="w-5 h-5"></i>
-                    <span class="font-bold tracking-widest uppercase">Ohana significa família</span>
+                    <span class="font-bold tracking-widest">Ohana significa família</span>
                     <i data-lucide="flower-2" class="w-5 h-5"></i>
                 </div>
                 
@@ -296,9 +296,9 @@
             loop: true,
             loopedSlides: 4, 
             coverflowEffect: {
-                rotate: 15, // Um pouco menos de rotação para não distorcer muito a "foto"
+                rotate: 15, 
                 stretch: 0,
-                depth: 200, // Um pouco mais de profundidade para saltar mais
+                depth: 200, 
                 modifier: 1,
                 slideShadows: true,
             },
